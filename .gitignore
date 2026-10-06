@@ -1,43 +1,11 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
-node_modules/
-
-# Expo
-.expo/
-dist/
-web-build/
-expo-env.d.ts
-
-# Native
-.kotlin/
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
 # macOS
 .DS_Store
-*.pem
 
-# local env files
-.env*.local
+# Office temp files
+~$*
 
-# typescript
-*.tsbuildinfo
+# Out of date (Firebase/EAS notes conflict with v1 on-device rule); update before Phase 3
+Document-Scanning-Notes.docx
 
-example
-
-# generated native folders
-/ios
-/android
+# Mockups are tracked once they're redrawn with the Foldwell name
+0-Mockups-Overview.png
