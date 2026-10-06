@@ -37,7 +37,7 @@ I want to do next.
 
 ## Open items (pick up here)
 
-1. **iOS preview build: done, worked.** Installed on Maribel's iPhone; the icon looks great and the splash screen shows. Still to confirm: Note Box works the same in the build as in Expo Go.
+1. **iOS preview build: done, worked.** Installed on Maribel's iPhone; the icon looks great, the splash screen shows, and the Note Box works the same as in Expo Go. Nothing left to do here.
 2. **Note Box phone test:** Maribel was testing in Expo Go and with a child if possible. Bring feedback: does tapping envelopes make sense, is text big enough, anything babyish?
 3. **`Document-Scanning-Notes.docx` needs fixes before Phase 3:** it says "Passing Notes", suggests Firebase Storage (breaks the on-device rule for v1), mentions a "child's phone" (v1 is one shared device), and says EAS is already in use. Kept out of Git until fixed.
 4. **Mockup images** still say "Passing Notes" on the notebook cover; redraw in the design tool. Mockup PNG is kept out of Git until then.
