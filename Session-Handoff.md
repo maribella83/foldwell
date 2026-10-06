@@ -37,13 +37,24 @@ I want to do next.
 
 ## Open items (pick up here)
 
-1. **iOS preview build:** was running at the end of the session. Check the result on the Expo builds page. If it worked, install it and check: icon on home screen (not cropped), splash screen, name "Foldwell", Note Box works.
+1. **iOS preview build: done, worked.** Installed on Maribel's iPhone; the icon looks great and the splash screen shows. Still to confirm: Note Box works the same in the build as in Expo Go.
 2. **Note Box phone test:** Maribel was testing in Expo Go and with a child if possible. Bring feedback: does tapping envelopes make sense, is text big enough, anything babyish?
 3. **`Document-Scanning-Notes.docx` needs fixes before Phase 3:** it says "Passing Notes", suggests Firebase Storage (breaks the on-device rule for v1), mentions a "child's phone" (v1 is one shared device), and says EAS is already in use. Kept out of Git until fixed.
 4. **Mockup images** still say "Passing Notes" on the notebook cover; redraw in the design tool. Mockup PNG is kept out of Git until then.
 5. **`mobile/example/`** holds Expo's sample screens for reference (ignored by Git). Delete whenever.
 6. **Unused Expo placeholder images** are still in `mobile/assets/images/` (expo-logo, react-logo, etc.). Safe to clean up later.
 7. **Attorney:** trademark filing for Foldwell; COPPA review; privacy policy before the website sign-up form goes live.
+
+## New idea: first-open explainer (added October 5, 2026)
+
+Maribel wants a short welcome experience the first time a parent opens the app: an **explainer slider**, or possibly a **small animation or video**, about why Foldwell exists, what it's for, and why it matters. The feeling to land: *not just an app, not a website: a connector for you and yours.*
+
+Notes for when we build it:
+- **Parents only.** Shown on first open before family setup; never in the kid view. Skippable, and re-openable later from settings.
+- **Start with a swipeable slider** (3–4 cards, paper look, our fonts and colors). It's cheap and reversible, fits the current phase, and the same words can go on the website home page.
+- **Animation or video comes later.** CLAUDE.md lists animations and video as out of scope early (react-native-reanimated is planned for later). Any motion must respect the iPhone's Reduce Motion setting, with a still version.
+- **Words matter most.** Draft the copy first (English, Spanish-ready). Follow the Website Brief's "claims to avoid": no "first/only/best," no therapy or mental-health claims, and no promising features that aren't built yet.
+- Possible card flow: why (real words from home are rare now) → what (notes, voice, stickers, doodles) → the keepsake (it becomes something you can hold) → privacy promise (on your phone, no ads, kids don't type).
 
 ## Suggested next steps (choose one)
 
