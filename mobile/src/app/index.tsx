@@ -1,52 +1,39 @@
 /**
- * Temporary "Hello" screen (Kickoff step A3).
+ * Note Box home (ages 4–8). Static screen with FAKE notes (Kickoff step A6).
  *
- * Its only job is to prove the theme works on a real phone: the paper
- * background, the three fonts, and one note in each note color.
- * It gets replaced when we build the real home screen.
+ * What's deliberately missing: no note counts, no "new" badges, no
+ * empty-box guilt, no timers. Tapping an envelope opens that note.
  */
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { ScrollView, StyleSheet, Text, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { APP_NAME } from '@/constants/app';
-import { fonts, fontSize, noteColors, palette, radius, space, type NoteKind } from '@/theme/tokens';
+import { NoteBox } from '@/components/note-box/note-box';
+import { sampleChild, sampleNotes } from '@/data/sample-notes';
+import { fonts, fontSize, palette, space } from '@/theme/tokens';
 
-const sampleNotes: { kind: NoteKind; label: string; text: string }[] = [
-  { kind: 'parent', label: 'PARENT NOTE', text: 'I loved hearing you laugh at breakfast today.' },
-  { kind: 'folded', label: 'FOLDED NOTE', text: 'Proud of how you handled this week.' },
-  { kind: 'reply', label: 'REPLY', text: 'Thank you. Love you too.' },
-];
+const MAX_BOX_WIDTH = 420;
 
-export default function HelloScreen() {
+export default function NoteBoxScreen() {
+  const { width: screenWidth } = useWindowDimensions();
+  const boxWidth = Math.min(screenWidth - space.lg * 2, MAX_BOX_WIDTH);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.eyebrow}>BY CIRCLEROOTTECH</Text>
-        <Text style={styles.title} accessibilityRole="header">
-          Hello from {APP_NAME}
+        <Text style={styles.greeting} accessibilityRole="header">
+          Hi, {sampleChild.nickname}!
         </Text>
-        <Text style={styles.subtitle}>
-          Notes from home, in your own words.
-        </Text>
+        <Text style={styles.hint}>Tap a note to open it.</Text>
 
-        <View style={styles.kidCard}>
-          <Text style={styles.kidText}>Hi, sweet pea!</Text>
-          <Text style={styles.kidCaption}>Nunito, kid size, on the Note Box background</Text>
-        </View>
-
-        {sampleNotes.map((note) => (
-          <View
-            key={note.kind}
-            style={[styles.note, { backgroundColor: noteColors[note.kind].background }]}
-          >
-            <Text style={[styles.noteLabel, { color: noteColors[note.kind].text }]}>
-              {note.label}
-            </Text>
-            <Text style={[styles.noteText, { color: noteColors[note.kind].text }]}>
-              {note.text}
-            </Text>
-          </View>
-        ))}
+        <NoteBox
+          notes={sampleNotes}
+          nickname={sampleChild.nickname}
+          width={boxWidth}
+          onOpen={(note) =>
+            router.push({ pathname: '/note/[id]', params: { id: note.id } })
+          }
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -55,61 +42,24 @@ export default function HelloScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: palette.paper,
+    backgroundColor: palette.kidBackground,
   },
   content: {
-    padding: space.lg,
-    gap: space.md,
+    alignItems: 'center',
+    paddingHorizontal: space.lg,
+    paddingTop: space.xl,
+    paddingBottom: space.xxl,
   },
-  eyebrow: {
-    fontFamily: fonts.label,
-    fontSize: fontSize.label,
-    letterSpacing: 1.5,
-    color: palette.softInk,
-    marginTop: space.lg,
-  },
-  title: {
-    fontFamily: fonts.noteBold,
-    fontSize: fontSize.title,
-    color: palette.ink,
-  },
-  subtitle: {
-    fontFamily: fonts.noteItalic,
-    fontSize: fontSize.body,
-    color: palette.softInk,
-    marginBottom: space.sm,
-  },
-  kidCard: {
-    backgroundColor: palette.kidBackground,
-    borderColor: palette.kraft,
-    borderWidth: 2,
-    borderRadius: radius.lg,
-    padding: space.lg,
-    gap: space.xs,
-  },
-  kidText: {
+  greeting: {
     fontFamily: fonts.uiExtraBold,
     fontSize: fontSize.kidTitle,
     color: palette.ink,
   },
-  kidCaption: {
-    fontFamily: fonts.ui,
-    fontSize: fontSize.small,
+  hint: {
+    fontFamily: fonts.uiSemiBold,
+    fontSize: 18,
     color: palette.softInk,
-  },
-  note: {
-    borderRadius: radius.md,
-    padding: space.lg,
-    gap: space.sm,
-  },
-  noteLabel: {
-    fontFamily: fonts.labelMedium,
-    fontSize: fontSize.label,
-    letterSpacing: 1.2,
-  },
-  noteText: {
-    fontFamily: fonts.note,
-    fontSize: fontSize.note,
-    lineHeight: fontSize.note * 1.4,
+    marginTop: space.xs,
+    marginBottom: space.xl,
   },
 });

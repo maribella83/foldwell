@@ -28,6 +28,33 @@ export const noteColors = {
 export type NoteKind = keyof typeof noteColors;
 
 /**
+ * Soft envelope colors for the Note Box. Same paper/ink pairs as the notes,
+ * named by look rather than meaning, because an envelope's color is just
+ * decoration (any note can arrive in any envelope).
+ */
+export const envelopeColors = {
+  butter: { paper: '#FAEEDA', ink: '#5A3A12' },
+  mint: { paper: '#E1F5EE', ink: '#0F5547' },
+  blush: { paper: '#FBEAF0', ink: '#7A2448' },
+} as const;
+
+export type EnvelopeColor = keyof typeof envelopeColors;
+
+/**
+ * Colors for the simple placeholder pictures on notes. Drawn from the
+ * Look A / Look B palettes in CLAUDE.md so everything stays in one family.
+ */
+export const illustration = {
+  sky: '#B9CFE0',
+  sun: '#F7EBC4',
+  hill: '#A8C3B1',
+  hillFar: '#E8EFE9',
+  clay: '#E7B9A6',
+  cream: '#FFFDF8',
+  night: '#5F5E5A',
+} as const;
+
+/**
  * Font family names. These strings must match the keys passed to useFonts()
  * in src/theme/fonts.ts.
  *
@@ -90,6 +117,8 @@ export const touchTarget = {
 export const theme = {
   palette,
   noteColors,
+  envelopeColors,
+  illustration,
   fonts,
   fontSize,
   space,
