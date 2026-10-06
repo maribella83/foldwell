@@ -1,98 +1,115 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+/**
+ * Temporary "Hello" screen (Kickoff step A3).
+ *
+ * Its only job is to prove the theme works on a real phone: the paper
+ * background, the three fonts, and one note in each note color.
+ * It gets replaced when we build the real home screen.
+ */
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { APP_NAME } from '@/constants/app';
+import { fonts, fontSize, noteColors, palette, radius, space, type NoteKind } from '@/theme/tokens';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+const sampleNotes: { kind: NoteKind; label: string; text: string }[] = [
+  { kind: 'parent', label: 'PARENT NOTE', text: 'I loved hearing you laugh at breakfast today.' },
+  { kind: 'folded', label: 'FOLDED NOTE', text: 'Proud of how you handled this week.' },
+  { kind: 'reply', label: 'REPLY', text: 'Thank you. Love you too.' },
+];
+
+export default function HelloScreen() {
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.eyebrow}>BY CIRCLEROOTTECH</Text>
+        <Text style={styles.title} accessibilityRole="header">
+          Hello from {APP_NAME}
+        </Text>
+        <Text style={styles.subtitle}>
+          Notes from home, in your own words.
+        </Text>
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+        <View style={styles.kidCard}>
+          <Text style={styles.kidText}>Hi, sweet pea!</Text>
+          <Text style={styles.kidCaption}>Nunito, kid size, on the Note Box background</Text>
+        </View>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+        {sampleNotes.map((note) => (
+          <View
+            key={note.kind}
+            style={[styles.note, { backgroundColor: noteColors[note.kind].background }]}
+          >
+            <Text style={[styles.noteLabel, { color: noteColors[note.kind].text }]}>
+              {note.label}
+            </Text>
+            <Text style={[styles.noteText, { color: noteColors[note.kind].text }]}>
+              {note.text}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    backgroundColor: palette.paper,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+  content: {
+    padding: space.lg,
+    gap: space.md,
+  },
+  eyebrow: {
+    fontFamily: fonts.label,
+    fontSize: fontSize.label,
+    letterSpacing: 1.5,
+    color: palette.softInk,
+    marginTop: space.lg,
   },
   title: {
-    textAlign: 'center',
+    fontFamily: fonts.noteBold,
+    fontSize: fontSize.title,
+    color: palette.ink,
   },
-  code: {
-    textTransform: 'uppercase',
+  subtitle: {
+    fontFamily: fonts.noteItalic,
+    fontSize: fontSize.body,
+    color: palette.softInk,
+    marginBottom: space.sm,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  kidCard: {
+    backgroundColor: palette.kidBackground,
+    borderColor: palette.kraft,
+    borderWidth: 2,
+    borderRadius: radius.lg,
+    padding: space.lg,
+    gap: space.xs,
+  },
+  kidText: {
+    fontFamily: fonts.uiExtraBold,
+    fontSize: fontSize.kidTitle,
+    color: palette.ink,
+  },
+  kidCaption: {
+    fontFamily: fonts.ui,
+    fontSize: fontSize.small,
+    color: palette.softInk,
+  },
+  note: {
+    borderRadius: radius.md,
+    padding: space.lg,
+    gap: space.sm,
+  },
+  noteLabel: {
+    fontFamily: fonts.labelMedium,
+    fontSize: fontSize.label,
+    letterSpacing: 1.2,
+  },
+  noteText: {
+    fontFamily: fonts.note,
+    fontSize: fontSize.note,
+    lineHeight: fontSize.note * 1.4,
   },
 });
