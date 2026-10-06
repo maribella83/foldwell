@@ -23,7 +23,7 @@ Rules for building now:
 - Do not over-invest in later phases. Features may change after the paper test.
 - The app is named **Foldwell** (chosen October 2026 after a USPTO search and domain check; the earlier working name "Passing Notes" was taken). iOS bundle ID and Android package: `com.circleroottech.foldwell`. Domain: foldwellnotes.com. Social: @foldwellnotes on Instagram and TikTok. The name lives in `mobile/src/constants/app.ts` and `mobile/app.json`; screens read it from the constants file, never hardcode it.
 
-Current step: Phase 1, Foundation (Blueprint Section 10).
+Current step: Phase 1, Foundation (Blueprint Section 10). Kickoff steps A3–A6 are done (October 5, 2026); this is the "stop and reassess" point. See `Session-Handoff.md` for open items and next steps.
 
 ## Tech stack
 - Expo (React Native) with TypeScript

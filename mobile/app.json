@@ -8,7 +8,10 @@
     "scheme": "foldwell",
     "userInterfaceStyle": "light",
     "ios": {
-      "bundleIdentifier": "com.circleroottech.foldwell"
+      "bundleIdentifier": "com.circleroottech.foldwell",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -37,6 +40,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9c79e356-78bd-4521-8b25-0a66956e920b"
+      }
+    },
+    "owner": "maribella83"
   }
 }
