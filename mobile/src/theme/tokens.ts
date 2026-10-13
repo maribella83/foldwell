@@ -12,6 +12,14 @@ export const palette = {
   paper: '#FBFAF6',
   white: '#FFFFFF',
 
+  // Parent screens
+  /** Hairline borders on cards and inputs. */
+  line: '#E4DED2',
+  /** Example text inside an empty field: clearly lighter than typed text. */
+  placeholder: '#A29D93',
+  /** Remove / can't-undo actions, and form errors. 7:1 on paper. */
+  danger: '#8E2F3C',
+
   // Note Box (ages 4–8)
   kidBackground: '#FFF7EC',
   kraft: '#C9A06B',
@@ -52,6 +60,15 @@ export const illustration = {
   clay: '#E7B9A6',
   cream: '#FFFDF8',
   night: '#5F5E5A',
+} as const;
+
+/** The black-and-white marbled composition notebook cover (ages 9+). */
+export const notebookCover = {
+  cover: '#232321',
+  spine: '#121211',
+  marble: '#EDEAE3',
+  label: '#FFFDF8',
+  labelRule: '#B9CFE0',
 } as const;
 
 /**
@@ -119,6 +136,7 @@ export const theme = {
   noteColors,
   envelopeColors,
   illustration,
+  notebookCover,
   fonts,
   fontSize,
   space,

@@ -1,39 +1,49 @@
 /**
- * Note Box home (ages 4–8). Static screen with FAKE notes (Kickoff step A6).
+ * "Your family": the parent's home screen and the first thing the app shows.
  *
- * What's deliberately missing: no note counts, no "new" badges, no
- * empty-box guilt, no timers. Tapping an envelope opens that note.
+ * Each child is a card showing their nickname, age range, and whether they
+ * get a Note Box or a Notebook. No counts, no "unread", no reminders: this
+ * screen should feel like opening a drawer of letters, not an inbox.
  */
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, Text, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { NoteBox } from '@/components/note-box/note-box';
-import { sampleChild, sampleNotes } from '@/data/sample-notes';
+import { AddChildCard, ChildCard } from '@/components/parent/child-card';
+import { APP_NAME } from '@/constants/app';
+import { useFamily } from '@/data/family';
 import { fonts, fontSize, palette, space } from '@/theme/tokens';
 
-const MAX_BOX_WIDTH = 420;
-
-export default function NoteBoxScreen() {
-  const { width: screenWidth } = useWindowDimensions();
-  const boxWidth = Math.min(screenWidth - space.lg * 2, MAX_BOX_WIDTH);
+export default function FamilyScreen() {
+  const { kids } = useFamily();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.greeting} accessibilityRole="header">
-          Hi, {sampleChild.nickname}!
+        <Text style={styles.brand}>{APP_NAME}</Text>
+        <Text style={styles.title} accessibilityRole="header">
+          Your family
         </Text>
-        <Text style={styles.hint}>Tap a note to open it.</Text>
+        <Text style={styles.subtitle}>
+          {kids.length > 0
+            ? 'Who would you like to write to?'
+            : 'Add a child to make their Note Box or Notebook.'}
+        </Text>
 
-        <NoteBox
-          notes={sampleNotes}
-          nickname={sampleChild.nickname}
-          width={boxWidth}
-          onOpen={(note) =>
-            router.push({ pathname: '/note/[id]', params: { id: note.id } })
-          }
-        />
+        <View style={styles.list}>
+          {kids.map((child) => (
+            <ChildCard
+              key={child.id}
+              child={child}
+              onPress={() =>
+                router.push({ pathname: '/child/[childId]', params: { childId: child.id } })
+              }
+            />
+          ))}
+          <AddChildCard onPress={() => router.push('/add-child')} />
+        </View>
+
+        <Text style={styles.privacy}>Everything stays on this phone. No ads, no tracking.</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -42,24 +52,44 @@ export default function NoteBoxScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: palette.kidBackground,
+    backgroundColor: palette.paper,
   },
   content: {
-    alignItems: 'center',
     paddingHorizontal: space.lg,
-    paddingTop: space.xl,
+    paddingTop: space.lg,
     paddingBottom: space.xxl,
+    maxWidth: 560,
+    width: '100%',
+    alignSelf: 'center',
   },
-  greeting: {
-    fontFamily: fonts.uiExtraBold,
-    fontSize: fontSize.kidTitle,
+  brand: {
+    fontFamily: fonts.labelMedium,
+    fontSize: fontSize.label,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    color: palette.softInk,
+  },
+  title: {
+    fontFamily: fonts.noteBold,
+    fontSize: 34,
     color: palette.ink,
+    marginTop: space.sm,
   },
-  hint: {
+  subtitle: {
     fontFamily: fonts.uiSemiBold,
-    fontSize: 18,
+    fontSize: fontSize.body,
     color: palette.softInk,
     marginTop: space.xs,
-    marginBottom: space.xl,
+    marginBottom: space.lg,
+  },
+  list: {
+    gap: space.sm + 4,
+  },
+  privacy: {
+    fontFamily: fonts.ui,
+    fontSize: fontSize.small,
+    color: palette.softInk,
+    textAlign: 'center',
+    marginTop: space.xl,
   },
 });

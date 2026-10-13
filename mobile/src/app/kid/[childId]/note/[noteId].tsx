@@ -1,8 +1,9 @@
 /**
  * One opened note in the Note Box (ages 4–8). FAKE data for now.
  *
- * The file name [id].tsx means "this screen takes an id from the link",
- * so /note/note-1 opens the note whose id is "note-1".
+ * The address /kid/sam/note/note-1 opens note "note-1" from Sam's box.
+ * The note is looked up only inside that child's box, so a link can't
+ * open another child's note.
  *
  * Built for a child and a grown-up looking at one screen together:
  * big picture, big text, big play button, big way back.
@@ -14,21 +15,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BackButton } from '@/components/note-box/back-button';
 import { NotePicture } from '@/components/note-box/note-picture';
 import { PlayButton } from '@/components/note-box/play-button';
-import { findSampleNote } from '@/data/sample-notes';
+import { findNoteForChild } from '@/data/sample-notes';
 import { envelopeColors, fonts, fontSize, palette, radius, space } from '@/theme/tokens';
 
-function goBackToBox() {
-  // If the note was opened from a link (nothing to go back to), go home.
-  if (router.canGoBack()) {
-    router.back();
-  } else {
-    router.replace('/');
-  }
-}
-
 export default function NoteScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const note = findSampleNote(id);
+  const { childId, noteId } = useLocalSearchParams<{ childId: string; noteId: string }>();
+  const note = findNoteForChild(childId, noteId);
+
+  function goBackToBox() {
+    // If the note was opened from a link (nothing to go back to), go to the box.
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace({ pathname: '/kid/[childId]', params: { childId } });
+    }
+  }
 
   if (!note) {
     return (

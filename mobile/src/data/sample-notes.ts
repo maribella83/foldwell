@@ -1,17 +1,11 @@
 /**
- * FAKE data for building the Note Box screens. Nothing here is saved.
+ * FAKE notes for building the Note Box screens. Nothing here is saved.
  * This file is replaced by the on-device database in a later step.
  *
- * Per the privacy rules, a child is only ever a nickname + age band.
+ * Only the sample child "Sam" has notes, so Bea's empty box shows what a
+ * brand-new Note Box looks like.
  */
 import type { EnvelopeColor } from '@/theme/tokens';
-
-export type AgeBand = '4-8' | '9-13' | '14+';
-
-export type Child = {
-  nickname: string;
-  ageBand: AgeBand;
-};
 
 /** Which simple placeholder picture to draw (stands in for a parent's photo). */
 export type PictureScene = 'sun' | 'moon' | 'heart';
@@ -25,12 +19,7 @@ export type BoxNote = {
   text: string;
 };
 
-export const sampleChild: Child = {
-  nickname: 'Sam',
-  ageBand: '4-8',
-};
-
-export const sampleNotes: BoxNote[] = [
+const samsNotes: BoxNote[] = [
   {
     id: 'note-1',
     from: 'Mom',
@@ -54,6 +43,21 @@ export const sampleNotes: BoxNote[] = [
   },
 ];
 
-export function findSampleNote(id: string | undefined): BoxNote | undefined {
-  return sampleNotes.find((note) => note.id === id);
+const notesByChild: Record<string, BoxNote[]> = {
+  sam: samsNotes,
+};
+
+const NO_NOTES: BoxNote[] = [];
+
+export function notesForChild(childId: string | undefined): BoxNote[] {
+  // hasOwn, so an id like "constructor" can't pick up a built-in property.
+  return childId && Object.hasOwn(notesByChild, childId) ? notesByChild[childId] : NO_NOTES;
+}
+
+/** Looks only inside this child's box, so one child's link can't open another's note. */
+export function findNoteForChild(
+  childId: string | undefined,
+  noteId: string | undefined,
+): BoxNote | undefined {
+  return notesForChild(childId).find((note) => note.id === noteId);
 }
