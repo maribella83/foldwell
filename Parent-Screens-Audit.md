@@ -37,6 +37,8 @@ New building blocks: family data (`src/data/family.tsx`), age bands (`src/consta
 
 ## 2. Decisions I made (please confirm or change)
 
+> **November 18, 2026:** Maribel confirmed the age bands (item 1), the full-name warning (item 3), the Grown-ups label for teens (item 5), and removing a child (item 6). Items 2 and 4 were built in but not part of that confirmation.
+
 1. **Age bands are now 4–8 / 9–12 / 13+** (they were 4–8 / 9–13 / 14+). They now match the legal under-13 line (COPPA), so every privacy rule maps onto a band. Which Notebook look a child sees first (Soft Collage or Oat and Ink) should become a separate setting the young person can switch.
 2. **Nothing is pre-selected** for a new child's age range. The parent picks on purpose.
 3. **The full-name check only warns, it never blocks.** "Maya Rose" shows a gentle heads-up, because "Mary Kate" is a real first name.

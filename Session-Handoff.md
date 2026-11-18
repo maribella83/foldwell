@@ -55,11 +55,7 @@ Your family (home)                     src/app/index.tsx
 
 ## Open items (pick up here)
 
-1. **Confirm the October 12 decisions** (`Parent-Screens-Audit.md`, section 2). They're built in but Maribel hasn't confirmed them yet:
-   - age bands 4–8 / 9–12 / 13+
-   - "Grown-ups" label for teens too
-   - removing a child allowed
-   - the full-name check warns but never blocks
+1. ~~Confirm the October 12 decisions~~ **Done November 18, 2026.** Maribel confirmed all four (see "Decisions made" below).
 2. **Phone checklist** (`Parent-Screens-Audit.md`, section 6). The app works in Expo Go, but these weren't each checked one by one yet: swipe-back blocked in the box, the hold with a real finger, swipe-down blocked on a half-filled sheet, keyboard, VoiceOver, and large text.
 3. **Expo package updates:** `expo-doctor` reports 6 small patch updates (for example expo-router 57.0.24 → 57.0.26). This predates the parent screens. Run `npx expo install --check` when ready, but ask first.
 4. **Note Box feedback from a real child:** does tapping envelopes make sense, is the text big enough, anything babyish?
@@ -92,6 +88,7 @@ Notes for when we build it:
 - App lives in `mobile/`; repo covers the whole project folder (docs + `mobile/`, later `website/`).
 - App opens on the parent's "Your family" screen; the kid view sits behind each child's page (October 12).
 - A child is only a nickname + age band. Nickname max 20 characters; no two children share a nickname (case doesn't matter).
+- Confirmed by Maribel, November 18, 2026: age bands 4–8 / 9–12 / 13+; the "Grown-ups" label also shows for teens; removing a child is allowed; the full-name check warns but never blocks. (Still worth asking teens in the paper test whether "Grown-ups" feels babyish.)
 - Sticker + text-to-speech test (StickerButton, speak.ts, feelings.ts, expo-speech) is **on hold until Week 4**.
 - Git commits for this repo use the GitHub private email `90976725+maribella83@users.noreply.github.com` (GitHub blocks pushes that expose other addresses).
 - Maribel has shipped Expo apps since May 2026; skip basics, still explain new things, give full files, small verified steps, ask before deleting or reorganizing.
