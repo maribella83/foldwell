@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AddChildCard, ChildCard } from '@/components/parent/child-card';
 import { APP_NAME } from '@/constants/app';
 import { useFamily } from '@/data/family';
+import { strings } from '@/strings';
 import { fonts, fontSize, palette, space } from '@/theme/tokens';
 
 export default function FamilyScreen() {
@@ -22,12 +23,10 @@ export default function FamilyScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.brand}>{APP_NAME}</Text>
         <Text style={styles.title} accessibilityRole="header">
-          Your family
+          {strings.family.title}
         </Text>
         <Text style={styles.subtitle}>
-          {kids.length > 0
-            ? 'Who would you like to write to?'
-            : 'Add a child to make their Note Box or Notebook.'}
+          {kids.length > 0 ? strings.family.subtitleWithKids : strings.family.subtitleEmpty}
         </Text>
 
         <View style={styles.list}>
@@ -43,7 +42,7 @@ export default function FamilyScreen() {
           <AddChildCard onPress={() => router.push('/add-child')} />
         </View>
 
-        <Text style={styles.privacy}>Everything stays on this phone. No ads, no tracking.</Text>
+        <Text style={styles.privacy}>{strings.family.privacy}</Text>
       </ScrollView>
     </SafeAreaView>
   );

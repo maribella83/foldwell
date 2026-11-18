@@ -58,7 +58,7 @@ Your family (home)                     src/app/index.tsx
 1. ~~Confirm the October 12 decisions~~ **Done November 18, 2026.** Maribel confirmed all four (see "Decisions made" below).
 2. **Phone checklist** (`Parent-Screens-Audit.md`, section 6). The app works in Expo Go, but these weren't each checked one by one yet: swipe-back blocked in the box, the hold with a real finger, swipe-down blocked on a half-filled sheet, keyboard, VoiceOver, and large text.
 3. **Expo package updates:** `expo-doctor` reports 6 small patch updates (for example expo-router 57.0.24 → 57.0.26). This predates the parent screens. Run `npx expo install --check` when ready, but ask first.
-4. **Note Box feedback from a real child:** does tapping envelopes make sense, is the text big enough, anything babyish?
+4. **Note Box feedback from a real child:** does tapping envelopes make sense, is the text big enough, anything babyish? *(November 18, 2026: families' feedback so far was positive, with nothing critical. That's encouraging but not very informative; ask pointed questions next time, e.g. "Did your child work out the envelopes without help? Was anything confusing or too babyish?")*
 5. **`Document-Scanning-Notes.docx` needs fixes before Phase 3:** it says "Passing Notes", suggests Firebase Storage (breaks the on-device rule for v1), mentions a "child's phone" (v1 is one shared device), and says EAS is already in use. Kept out of Git until fixed.
 6. **Mockup images** still say "Passing Notes" on the notebook cover; redraw in the design tool. Mockup PNG is kept out of Git until then.
 7. **Cleanup whenever:** `mobile/example/` (Expo samples, ignored by Git) and unused placeholder images in `mobile/assets/images/` (expo-logo, react-logo, etc.).

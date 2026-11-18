@@ -9,6 +9,7 @@ import Svg, { Path } from 'react-native-svg';
 
 import { ageBandInfo, containerNames } from '@/constants/age-bands';
 import type { Child } from '@/data/family';
+import { strings } from '@/strings';
 import { fonts, palette, radius, space } from '@/theme/tokens';
 
 import { ContainerThumb } from './container-thumb';
@@ -26,8 +27,8 @@ export function ChildCard({ child, onPress }: Props) {
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${child.nickname}, ${band.spoken}, ${container}`}
-      accessibilityHint={`Opens ${child.nickname}’s page`}
+      accessibilityLabel={strings.childCard.a11yLabel(child.nickname, band.spoken, container)}
+      accessibilityHint={strings.childCard.a11yHint(child.nickname)}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <ContainerThumb ageBand={child.ageBand} width={52} />
@@ -35,9 +36,7 @@ export function ChildCard({ child, onPress }: Props) {
         <Text style={styles.nickname} numberOfLines={1}>
           {child.nickname}
         </Text>
-        <Text style={styles.meta}>
-          {band.label} · {container}
-        </Text>
+        <Text style={styles.meta}>{strings.childCard.meta(band.label, container)}</Text>
       </View>
       <Svg width={20} height={20} viewBox="0 0 24 24">
         <Path
@@ -58,7 +57,7 @@ export function AddChildCard({ onPress }: { onPress: () => void }) {
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel="Add a child"
+      accessibilityLabel={strings.childCard.addChild}
       style={({ pressed }) => [styles.card, styles.addCard, pressed && styles.pressed]}
     >
       <View style={styles.plus}>
@@ -71,7 +70,7 @@ export function AddChildCard({ onPress }: { onPress: () => void }) {
           />
         </Svg>
       </View>
-      <Text style={styles.addLabel}>Add a child</Text>
+      <Text style={styles.addLabel}>{strings.childCard.addChild}</Text>
     </Pressable>
   );
 }
