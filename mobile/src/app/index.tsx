@@ -10,13 +10,14 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddChildCard, ChildCard } from '@/components/parent/child-card';
+import { ParentButton } from '@/components/parent/parent-button';
 import { APP_NAME } from '@/constants/app';
 import { useFamily } from '@/data/family';
 import { strings } from '@/strings';
 import { fonts, fontSize, palette, space } from '@/theme/tokens';
 
 export default function FamilyScreen() {
-  const { kids } = useFamily();
+  const { kids, loadSampleFamily } = useFamily();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
@@ -43,6 +44,18 @@ export default function FamilyScreen() {
         </View>
 
         <Text style={styles.privacy}>{strings.family.privacy}</Text>
+
+        {/* __DEV__ is true while developing and false in a real store build. */}
+        {__DEV__ ? (
+          <View style={styles.devArea}>
+            <ParentButton
+              label={strings.dev.loadSampleFamily}
+              variant="quiet"
+              compact
+              onPress={loadSampleFamily}
+            />
+          </View>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -90,5 +103,9 @@ const styles = StyleSheet.create({
     color: palette.softInk,
     textAlign: 'center',
     marginTop: space.xl,
+  },
+  devArea: {
+    alignItems: 'center',
+    marginTop: space.md,
   },
 });

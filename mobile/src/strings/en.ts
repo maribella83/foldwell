@@ -32,4 +32,9 @@ export const en = {
     a11yHint: (nickname: string) => `Opens ${nickname}’s page`,
     addChild: 'Add a child',
   },
+
+  /** Only shown while developing, never in a store build. */
+  dev: {
+    loadSampleFamily: 'Load sample family (testing only)',
+  },
 };

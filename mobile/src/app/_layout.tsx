@@ -15,10 +15,13 @@
  *                            leave with the hold-to-leave button.
  */
 import { Stack } from 'expo-router';
+import { SQLiteProvider } from 'expo-sqlite';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
+import { View } from 'react-native';
 
+import { DATABASE_NAME, migrateDatabase } from '@/data/database';
 import { FamilyProvider } from '@/data/family';
 import { useAppFonts } from '@/theme/fonts';
 import { fonts, palette } from '@/theme/tokens';
@@ -40,33 +43,40 @@ export default function RootLayout() {
     return null;
   }
 
+  // The database opens (and builds or updates its tables) before any screen
+  // shows. This takes a split second, so the wait is just a paper-colored
+  // screen, never a spinner or a flash of the wrong color.
   return (
-    <FamilyProvider>
-      <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: palette.paper },
-          headerStyle: { backgroundColor: palette.paper },
-          headerShadowVisible: false,
-          headerTintColor: palette.ink,
-          headerTitleStyle: { fontFamily: fonts.uiExtraBold, fontSize: 17 },
-          headerBackTitleStyle: { fontFamily: fonts.uiSemiBold },
-        }}
-      >
-        {/* "Family" is the back-button label on the child page. */}
-        <Stack.Screen name="index" options={{ title: 'Family' }} />
-        <Stack.Screen name="child/[childId]/index" options={{ headerShown: true, title: '' }} />
-        <Stack.Screen name="add-child" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="child/[childId]/edit" options={{ presentation: 'modal' }} />
-        <Stack.Screen
-          name="kid/[childId]"
-          options={{
-            gestureEnabled: false,
-            contentStyle: { backgroundColor: palette.kidBackground },
-          }}
-        />
-      </Stack>
-    </FamilyProvider>
+    <Suspense fallback={<View style={{ flex: 1, backgroundColor: palette.paper }} />}>
+      <SQLiteProvider databaseName={DATABASE_NAME} onInit={migrateDatabase} useSuspense>
+        <FamilyProvider>
+          <StatusBar style="dark" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: palette.paper },
+              headerStyle: { backgroundColor: palette.paper },
+              headerShadowVisible: false,
+              headerTintColor: palette.ink,
+              headerTitleStyle: { fontFamily: fonts.uiExtraBold, fontSize: 17 },
+              headerBackTitleStyle: { fontFamily: fonts.uiSemiBold },
+            }}
+          >
+            {/* "Family" is the back-button label on the child page. */}
+            <Stack.Screen name="index" options={{ title: 'Family' }} />
+            <Stack.Screen name="child/[childId]/index" options={{ headerShown: true, title: '' }} />
+            <Stack.Screen name="add-child" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="child/[childId]/edit" options={{ presentation: 'modal' }} />
+            <Stack.Screen
+              name="kid/[childId]"
+              options={{
+                gestureEnabled: false,
+                contentStyle: { backgroundColor: palette.kidBackground },
+              }}
+            />
+          </Stack>
+        </FamilyProvider>
+      </SQLiteProvider>
+    </Suspense>
   );
 }
