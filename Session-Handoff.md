@@ -1,33 +1,63 @@
 # Foldwell: Session Handoff
 
-**Last session:** October 12, 2026. **Update this file at the end of each session.**
+**Last session:** November 18–19, 2026. **Update this file at the end of each session.**
 
 ## Paste this to start a new chat
 
 ```
 Read CLAUDE.md and Session-Handoff.md. We're picking up where the last
-session left off. Start with the "Open items" list, then ask me what
-I want to do next.
+session left off. Start with "Start here tomorrow", then ask me how the
+phone check went.
 ```
+
+(Maribel likes to call Claude "Claudia." She is a new engineer: explain mobile and developer terms in plain words, define each term the first time, and keep steps small.)
+
+---
+
+## Start here tomorrow
+
+**Step 1 of storage (save children on the phone) is built and pushed, but Maribel has not checked it on her phone yet.** Everything passed in the cloud workspace (`tsc`, `expo lint`, an iPhone bundle build, a SQL test), but the database can only really run on a phone.
+
+Ask Maribel for the result of these five checks. She runs them in Expo Go after pulling the branch and running `npm install` (commands are under "Handy commands"):
+
+1. The app opens on an **empty** Your family screen (a fresh install starts empty; that is correct).
+2. Tap **Load sample family (testing only)**: Sam, Bea and Leo appear. Tap again: no duplicates.
+3. **Add a child** (for example "Mimi", 9–12), **close the app completely** (swipe it away), reopen from Expo Go: **Mimi is still there.** This is the main test.
+4. **Edit** her nickname, close fully, reopen: the new name stuck.
+5. **Remove** her, close fully, reopen: she stays gone.
+
+- **If all five pass:** go to **Step 2 (write a note)** in `Storage-and-Audio-Plan.md`. No new package is needed for Step 2.
+- **If any fail:** ask for the red error text or a screenshot and fix it before moving on.
+
+Also small and quick: ask Maribel to run `npx expo-doctor` on her Mac (two checks could not run in the cloud workspace because they need Expo's servers).
 
 ---
 
 ## Where things stand
 
-**Phase 1 (Foundation): navigation and family setup are built** with fake, in-memory data. The app opens on the parent's "Your family" screen, and each child's Note Box or Notebook sits behind their page. **It runs on Maribel's iPhone in Expo Go (confirmed October 12).** The database, audio, stickers, and doodles stay on hold until the Week 4 decision (paper-test and prototype feedback).
+**Phase 1 (Foundation).** Navigation and family setup are built. **The hold on storage and audio was lifted by Maribel on November 19, 2026**, because families who tried the Note Box expected the big voice button to play or record. Photos, stickers, doodles and print ordering are still on hold.
 
 | Item | Status |
 |---|---|
 | App name | **Foldwell** (was "Passing Notes", which was taken) |
 | Bundle ID / package | `com.circleroottech.foldwell` |
 | Domain / social | foldwellnotes.com, @foldwellnotes on Instagram and TikTok |
-| GitHub | https://github.com/maribella83/foldwell (private), branch `main` |
+| GitHub | https://github.com/maribella83/foldwell (private) |
 | Expo / EAS | https://expo.dev/accounts/maribella83/projects/foldwell |
-| Expo SDK | 58 (upgraded from 57 on November 19, 2026; routes live in `mobile/src/app/`). React Native 0.88, React 19.3. Expo Go on iPhone only supports the newest SDK, so it moved to 58 on its own and SDK 57 stopped opening. |
+| Expo SDK | **58** (upgraded from 57 on November 19, 2026). React Native 0.88, React 19.3. Confirmed working on Maribel's iPhone in Expo Go. |
+| Project folder on her Mac | `~/Desktop/passing-notes-app` (the app is in its `mobile` folder) |
+
+### IMPORTANT: where the work lives
+All of this session's work is on the branch **`claude/foldwell-session-handoff-piyjst`**, **not on `main`**. Maribel's Mac is switched to that branch. Nothing has been merged into `main`, and no pull request exists. Ask her when she wants to merge (a pull request is a request to merge a branch into `main`); do not create one unless she asks. Until then, `main` is still the October 12 version (SDK 57, fake in-memory data).
+
+### What happened this session (in order)
+1. Confirmed the four October 12 decisions.
+2. **Strings file, step 1:** `mobile/src/strings/en.ts` + `index.ts`. Only the Your family screen and child cards read from it so far. Checked in the web preview.
+3. Phone could not open the app: Expo Go had updated itself to SDK 58, and iPhones can only run the newest SDK. **Upgraded Foldwell to SDK 58** (done in the cloud workspace, one small code fix in `child/[childId]/edit.tsx` for a React Native type rename). Maribel confirmed the Your family screen, child page and Add/Edit sheets work.
+4. Maribel found the big voice button does nothing (it is a placeholder, by design) and said testers expected it to play or record. She lifted the hold; a plan was written and her four decisions confirmed (`Storage-and-Audio-Plan.md`).
+5. **Storage step 1 built** (see above).
 
 ## What's built (`mobile/`)
-
-**Screens (how the app fits together):**
 
 ```
 Your family (home)                     src/app/index.tsx
@@ -39,77 +69,91 @@ Your family (home)                     src/app/index.tsx
 └── Add a child (sheet)                src/app/add-child.tsx
 ```
 
-- **Family data** (`src/data/family.tsx`): FAKE and **in memory only**, so it resets when the app closes. Sam (4–8, has notes), Bea (4–8, empty box), Leo (13+). Screens use `useFamily()` and `useChild()`; when the database comes, only `FamilyProvider` changes.
-- **Sample notes** (`src/data/sample-notes.ts`): only Sam has notes. They're looked up per child, so one child's link can't open another's note.
-- **Age bands** (`src/constants/age-bands.ts`): 4–8 = Note Box, 9–12 and 13+ = Notebook. `isUnder13()` is there for privacy decisions.
+- **Database** (`src/data/database.ts`): on-device SQLite (`expo-sqlite`), numbered migrations, one table so far (`children`: id, nickname, age band, created time). **Never edit a migration once shipped; add a new one.** `SQLiteProvider` wraps the whole app in `src/app/_layout.tsx`.
+- **Family data** (`src/data/family.tsx`): `FamilyProvider` reads and writes the database. Screens still use `useFamily()` and `useChild()` exactly as before. A fresh install starts **empty**. A **development-only** "Load sample family (testing only)" button on the home screen adds Sam (4–8), Bea (4–8) and Leo (13+); real store builds never show it.
+- **Sample notes** (`src/data/sample-notes.ts`): still **FAKE** and in memory; only the sample child "Sam" (id `sam`) has them. Step 2 replaces this file with real saved notes.
+- **Strings** (`src/strings/`): English words for the Your family screen, child cards and the dev button. Every other screen still has its words written inside it.
+- **Age bands** (`src/constants/age-bands.ts`): 4–8 = Note Box, 9–12 and 13+ = Notebook. `isUnder13()` is for privacy decisions. Its labels ("Ages 4–8", "Note Box") are still English-only in that file.
 - **Kid view safety:** hold-to-leave "Grown-ups" button (1.5 seconds; a tap does nothing). iPhone swipe-back is off, and Android's back button is ignored on the box. It keeps small hands out but **isn't a lock**.
-- **Notebook cover** (`src/components/notebook/notebook-cover.tsx`): marbled composition cover drawn in code with a fixed pattern, so it matches what prints.
-- **Parent pieces** (`src/components/parent/`): button, child card, age-range picker, child form (nickname + age range only), sheet top bar.
-- **Theme** (`src/theme/tokens.ts`): all colors, including new `line`, `placeholder`, `danger`, and `notebookCover`. Screens never hardcode colors.
-- **Fonts** (`src/theme/fonts.ts`): Lora (notes and titles), Nunito (controls and kid text), DM Mono (labels). All SIL Open Font License, OK for print.
-- **Reduce Motion helper** (`src/hooks/use-reduce-motion.ts`).
-- **App name** in one place: `src/constants/app.ts` (plus `app.json`). App icons and splash screen are wired up.
-- **Web preview**: `.claude/launch.json` lets Claude check screens in its browser pane (port 8091).
+- **Big voice button** (`src/components/note-box/play-button.tsx`): a **placeholder**; its press does nothing yet. Size and look are final.
+- **Notebook cover**, parent pieces (`src/components/parent/`), theme (`src/theme/tokens.ts`, no hardcoded colors), fonts (Lora, Nunito, DM Mono, all open licenses), Reduce Motion helper, app name in `src/constants/app.ts` + `app.json`, icons and splash: all as before.
+- **Web preview does NOT work any more** with the database (it needs extra web setup; we test on the phone instead). `.claude/launch.json` still exists for the browser pane.
 
-**Full write-up of the parent screens** (decisions, the 10 bugs found and fixed, and what was tested): `Parent-Screens-Audit.md`.
+Full write-up of the parent screens, 10 bugs found and fixed: `Parent-Screens-Audit.md`.
 
-## Open items (pick up here)
+## Open items
 
-1. ~~Confirm the October 12 decisions~~ **Done November 18, 2026.** Maribel confirmed all four (see "Decisions made" below).
-2. **Phone checklist** (`Parent-Screens-Audit.md`, section 6). The app works in Expo Go, but these weren't each checked one by one yet: swipe-back blocked in the box, the hold with a real finger, swipe-down blocked on a half-filled sheet, keyboard, VoiceOver, and large text.
-3. **SDK 58 upgrade: confirmed on Maribel's iPhone in Expo Go, November 19, 2026.** The Your family screen, child page and the Add child / Edit sheets all work, so items (b) and (c) below turned out fine. Still open: (d) run `npx expo-doctor` on her Mac, and (e) the tunnel note. Original notes follow. Done in the cloud workspace on branch `claude/foldwell-session-handoff-piyjst`: packages upgraded, `tsc` and `expo lint` pass, an iOS bundle builds. One code fix was needed (`ScrollViewInstance` type in `child/[childId]/edit.tsx`). Not yet checked: (a) Maribel pulls the branch and runs `npm install` on her Mac, then opens the app in Expo Go; (b) on iOS 26+, SDK 58 makes Stack headers see-through, so look at the child page (`headerShown: true`) for content hiding under the header; fix with `headerTransparent: false` on that screen; (c) the Add child / Edit sheets in the web preview may look different (Router removed its experimental web modals); (d) two `expo-doctor` checks (config schema, React Native Directory) need Expo's servers and could not run in the cloud workspace, so run `npx expo-doctor` on her Mac; (e) `--tunnel` now needs `expo login` (use `--tunnel ngrok` for the old kind). The six-patch-update item is closed by this upgrade.
-3a. **Hold on storage and audio LIFTED (Maribel, November 19, 2026).** Reason: families who tried the Note Box expected the big voice button to play or record (it is a placeholder). A plan is saved in `Storage-and-Audio-Plan.md` (five small steps: save children, write a note, record a voice, play it, test with the real permission wording). Maribel confirmed the four decisions (all "recommended") on November 19, 2026. **Step 1 (save children) is BUILT but NOT yet checked on her phone:** `expo-sqlite` installed (approved), `src/data/database.ts` (migrations), `FamilyProvider` now reads and writes the database, `SQLiteProvider` wraps the app in `_layout.tsx`, and a development-only "Load sample family (testing only)" button shows on the home screen. `tsc`, `expo lint`, an iOS bundle and a SQL test all pass in the cloud workspace. Her check: add a child, close the app fully, reopen (child still there); edit and remove survive too; the sample button loads Sam, Bea and Leo. Known: the web preview will not work with the database (needs extra web setup; we use the phone). `npm audit` reports 3 moderate issues in Expo's own tooling (`minimatch` inside `@expo/fingerprint`), not in the app; the suggested fix is a downgrade to Expo 52, so ignore it. Still to ask before installing: `expo-audio`, `expo-file-system`.
-3b. **Strings file (Spanish-readiness), step 1 done and checked in the web preview:** `mobile/src/strings/en.ts` and `index.ts` exist; only the "Your family" screen and child cards read from them. Next: move the remaining screens (about 17 files), then wording still in `constants/age-bands.ts`, then draft Spanish (needs a native-speaker review).
-3c. **Slow first runs on Maribel's Mac (November 18–19, 2026):** first `tsc`/`lint`/Metro runs took minutes (88 seconds for one `tsc`), later runs took 2 seconds. Cause not found (iCloud Desktop sync was a guess, not confirmed). Be patient on first runs. Also: `npx expo start` asks a question if port 8081 is used by another project (Merak), so answer `y` or use `--port 8082`.
-4. **Note Box feedback from a real child:** does tapping envelopes make sense, is the text big enough, anything babyish? *(November 18, 2026: families' feedback so far was positive, with nothing critical. That's encouraging but not very informative; ask pointed questions next time, e.g. "Did your child work out the envelopes without help? Was anything confusing or too babyish?")*
-5. **`Document-Scanning-Notes.docx` needs fixes before Phase 3:** it says "Passing Notes", suggests Firebase Storage (breaks the on-device rule for v1), mentions a "child's phone" (v1 is one shared device), and says EAS is already in use. Kept out of Git until fixed.
-6. **Mockup images** still say "Passing Notes" on the notebook cover; redraw in the design tool. Mockup PNG is kept out of Git until then.
-7. **Cleanup whenever:** `mobile/example/` (Expo samples, ignored by Git) and unused placeholder images in `mobile/assets/images/` (expo-logo, react-logo, etc.).
-8. **Attorney:** trademark filing for Foldwell; COPPA review; privacy policy before the website sign-up form goes live. Add the in-app line "Everything stays on this phone. No ads, no tracking." to the review.
+1. **Phone check of storage Step 1** (above), then Steps 2–5 of `Storage-and-Audio-Plan.md`: write a note, record a voice, play it, test with the real microphone wording via an EAS build. **Ask before installing** `expo-audio` and `expo-file-system`.
+2. **Strings file, remaining work:** convert the other screens (about 17 files, in small batches Maribel checks), then the wording in `constants/age-bands.ts`, then draft Spanish (a native speaker should review it). New screens should read from `src/strings/` from the start.
+3. **Phone checklist** (`Parent-Screens-Audit.md`, section 6), still not checked one by one: swipe-back blocked in the Note Box, the Grown-ups hold with a real finger, swipe-down blocked on a half-filled sheet, keyboard, VoiceOver, large text. Now possible because the phone works.
+4. **`CLAUDE.md` still says to hold audio and the database** ("Current phase" section). Maribel lifted that hold on November 19. Ask her OK and update that paragraph.
+5. **`expo-doctor` on her Mac** (two checks need Expo's servers). Also `--tunnel` now needs `expo login` (use `--tunnel ngrok` for the old kind), but a normal Wi-Fi connection works now.
+6. **Note Box feedback:** families' feedback so far was positive with nothing critical, and they expected the voice button to play or record. Next time ask pointed questions ("Did your child work out the envelopes without help? Was anything confusing or too babyish?").
+7. **`Document-Scanning-Notes.docx` needs fixes before Phase 3:** it says "Passing Notes", suggests Firebase Storage (breaks the on-device rule for v1), mentions a "child's phone" (v1 is one shared device), and says EAS is already in use. Kept out of Git until fixed.
+8. **Mockup images** still say "Passing Notes" on the notebook cover; redraw in the design tool. Mockup PNG is kept out of Git until then.
+9. **Cleanup whenever:** `mobile/example/` (Expo samples, ignored by Git) and unused placeholder images in `mobile/assets/images/`. Ask before deleting.
+10. **Attorney list:** trademark filing for Foldwell; COPPA review; privacy policy before the website sign-up form goes live; the in-app line "Everything stays on this phone. No ads, no tracking."; and **new: iPhone's own backup may include the app's files (including voice recordings) in the person's iCloud by default** (not our servers, but CLAUDE.md puts cloud backup out of scope until legal review).
+11. **`npm audit`** shows 3 moderate issues inside Expo's own tooling (`minimatch` in `@expo/fingerprint`). Not in the app. The suggested fix is a downgrade to Expo 52, so **ignore it**.
 
-## Suggested next steps (choose one)
+## Other next steps (when ready)
 
-- **Website (Track C):** first job is recruiting paper-test families and a parent waitlist at foldwellnotes.com. Privacy page before any sign-up form. See `Website-Brief.md`.
+- **Website (Track C):** recruit paper-test families and a parent waitlist at foldwellnotes.com. Privacy page before any sign-up form. See `Website-Brief.md`.
 - **First-open explainer slider** for parents (see below). Draft the words first.
-- **Parent PIN** behind the Grown-ups gate. Needs `expo-secure-store` (a new package), so ask first.
-- **Strings file for Spanish-readiness:** move all on-screen words into one place with full sentences per language. English possessives like "Sam's Note Box" don't translate word for word.
-- **Wait for feedback** and act on the paper-test and Note Box results.
+- **Parent PIN** behind the Grown-ups gate. Needs `expo-secure-store` (new package), so ask first.
 
 ## Idea: first-open explainer (added October 5, 2026)
 
 Maribel wants a short welcome experience the first time a parent opens the app: an **explainer slider**, or possibly a **small animation or video**, about why Foldwell exists, what it's for, and why it matters. The feeling to land: *not just an app, not a website: a connector for you and yours.*
 
-Notes for when we build it:
 - **Parents only.** Shown on first open, before "Your family"; never in the kid view. Skippable, and re-openable later from settings.
-- **Start with a swipeable slider** (3–4 cards, paper look, our fonts and colors). It's cheap and reversible, fits the current phase, and the same words can go on the website home page.
-- **Animation or video comes later.** CLAUDE.md lists animations and video as out of scope early. Any motion must respect Reduce Motion (use `useReduceMotion()`), with a still version.
-- **Words matter most.** Draft the copy first (English, Spanish-ready). Follow the Website Brief's "claims to avoid": no "first/only/best," no therapy or mental-health claims, and no promising features that aren't built yet.
-- Possible card flow: why (real words from home are rare now) → what (notes, voice, stickers, doodles) → the keepsake (it becomes something you can hold) → privacy promise (on your phone, no ads, kids don't type).
+- **Start with a swipeable slider** (3–4 cards, paper look, our fonts and colors). Cheap and reversible; the same words can go on the website home page.
+- **Animation or video comes later** (CLAUDE.md lists them as out of scope early). Any motion must respect Reduce Motion (`useReduceMotion()`), with a still version.
+- **Words matter most.** Draft the copy first (English, Spanish-ready). Follow the Website Brief's "claims to avoid": no "first/only/best," no therapy or mental-health claims, no promising features that aren't built yet.
+- Possible card flow: why (real words from home are rare now) → what (notes, voice, stickers, doodles) → the keepsake → privacy promise (on your phone, no ads, kids don't type).
 
 ## Decisions made (don't re-ask)
 
 - App lives in `mobile/`; repo covers the whole project folder (docs + `mobile/`, later `website/`).
-- App opens on the parent's "Your family" screen; the kid view sits behind each child's page (October 12).
+- App opens on the parent's "Your family" screen; the kid view sits behind each child's page.
 - A child is only a nickname + age band. Nickname max 20 characters; no two children share a nickname (case doesn't matter).
-- Confirmed by Maribel, November 18, 2026: age bands 4–8 / 9–12 / 13+; the "Grown-ups" label also shows for teens; removing a child is allowed; the full-name check warns but never blocks. (Still worth asking teens in the paper test whether "Grown-ups" feels babyish.)
-- Sticker + text-to-speech test (StickerButton, speak.ts, feelings.ts, expo-speech) is **on hold until Week 4**.
-- Git commits for this repo use the GitHub private email `90976725+maribella83@users.noreply.github.com` (GitHub blocks pushes that expose other addresses).
-- Maribel has shipped Expo apps since May 2026; skip basics, still explain new things, give full files, small verified steps, ask before deleting or reorganizing.
+- Confirmed November 18: age bands 4–8 / 9–12 / 13+; the "Grown-ups" label also shows for teens (still worth asking teens in the paper test if it feels babyish); removing a child is allowed; the full-name check warns but never blocks.
+- Confirmed November 19 (storage and audio): a fresh install starts **empty**, with a developer-only way to load sample children; a note needs words **or** a voice recording, either is fine; "from" on a note is a label the parent types ("Mom", "Grandma"); the iPhone-backup question goes on the attorney list.
+- Upgrade to SDK 58 approved and done November 19. `expo-sqlite` installed with Maribel's approval.
+- Sticker + text-to-speech test (StickerButton, speak.ts, feelings.ts, expo-speech) is still **on hold**.
+- Git commits for this repo use the GitHub private email `90976725+maribella83@users.noreply.github.com` (GitHub blocks pushes that expose other addresses). Push only to `claude/foldwell-session-handoff-piyjst`.
+- Maribel has shipped Expo apps since May 2026; skip basics, still explain new things, give full files, small verified steps, ask before deleting, reorganizing or installing packages.
+
+## Things learned about the setup (save time)
+
+- **Cloud workspace vs. her Mac:** the cloud workspace (where Claude runs) is fast and runs `tsc`, `expo lint`, an iPhone bundle build and package installs; it cannot run the app or the phone-only database. Workflow that worked: Claude installs and changes code in the cloud and pushes; Maribel runs `git pull`, `npm install`, then `npx expo start` on her Mac and checks on her iPhone.
+- In the cloud workspace, `npx expo install` and `expo-doctor` cannot reach `api.expo.dev`, so run them with `EXPO_OFFLINE=1` (uses the version list shipped inside the `expo` package). Maribel approved adding `docs.expo.dev` and `expo.dev` to the workspace's allowed sites so Expo's docs can be read (this setting applies to her future sessions too).
+- **Always read Expo's current docs before touching Expo APIs** (the `mobile/AGENTS.md` rule). Versioned pages: `https://docs.expo.dev/versions/v58.0.0/sdk/<package>.md`.
+- **Her Mac is slow the first time** it reads files after a change: the first `tsc`/`lint`/Metro run took minutes (88 seconds for one `tsc`), later runs 2 seconds. Cause not found (iCloud Desktop sync was only a guess). Be patient; ask how long she waited.
+- **Port 8081 is taken** by her other project (Merak). `npx expo start` then asks a question; answer `y`, or use `--port 8082`.
+- Her Terminal opens in her home folder; she must `cd ~/Desktop/passing-notes-app` first. Several other Expo servers (Merak, Kongvene) may be running at once; that was not the cause of any problem.
 
 ## Handy commands
 
-Expo must be started from the `mobile` folder, not the project folder:
+On Maribel's Mac, to get the newest work from the session branch (she is already switched to it):
 
 ```bash
-cd ~/Desktop/passing-notes-app/mobile
+cd ~/Desktop/passing-notes-app
 ```
 
 ```bash
-npx expo start -c
+git pull origin claude/foldwell-session-handoff-piyjst
 ```
 
 ```bash
-npx eas-cli@latest build --profile preview --platform ios
+cd mobile
 ```
 
-Checks before saving work: `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor`.
+```bash
+npm install
+```
+
+```bash
+npx expo start --port 8082
+```
+
+Then scan the QR code with the iPhone Camera app (Expo Go opens). Checks before saving work: `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor`. EAS build for a phone test build: `npx eas-cli@latest build --profile preview --platform ios`.
