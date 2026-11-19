@@ -1,26 +1,28 @@
 /**
- * One opened note in the Note Box (ages 4–8). FAKE data for now.
+ * One opened note in the Note Box (ages 4–8).
  *
- * The address /kid/sam/note/note-1 opens note "note-1" from Sam's box.
- * The note is looked up only inside that child's box, so a link can't
- * open another child's note.
+ * The address /kid/<childId>/note/<noteId> opens one saved note. The note is
+ * looked up only inside that child's box, so a link can't open another
+ * child's note.
  *
- * Built for a child and a grown-up looking at one screen together:
- * big picture, big text, big play button, big way back.
+ * Built for a child and a grown-up looking at one screen together: big text
+ * and a big way back. The big "Hear Mom" play button isn't shown yet: no note
+ * has a voice recording, and a button that does nothing is just confusing. It
+ * comes back, on notes that have a voice, when recording is built.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BackButton } from '@/components/note-box/back-button';
-import { NotePicture } from '@/components/note-box/note-picture';
-import { PlayButton } from '@/components/note-box/play-button';
-import { findNoteForChild } from '@/data/sample-notes';
+import { useFamily } from '@/data/family';
+import { strings } from '@/strings';
 import { envelopeColors, fonts, fontSize, palette, radius, space } from '@/theme/tokens';
 
 export default function NoteScreen() {
   const { childId, noteId } = useLocalSearchParams<{ childId: string; noteId: string }>();
-  const note = findNoteForChild(childId, noteId);
+  const { findNote } = useFamily();
+  const note = findNote(childId, noteId);
 
   function goBackToBox() {
     // If the note was opened from a link (nothing to go back to), go to the box.
@@ -35,8 +37,8 @@ export default function NoteScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
-          <BackButton label="Back to my box" onPress={goBackToBox} />
-          <Text style={styles.missing}>This note isn’t here.</Text>
+          <BackButton label={strings.kidNote.backToBox} onPress={goBackToBox} />
+          <Text style={styles.missing}>{strings.kidNote.missing}</Text>
         </View>
       </SafeAreaView>
     );
@@ -47,19 +49,14 @@ export default function NoteScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
-        <BackButton label="Back to my box" onPress={goBackToBox} />
+        <BackButton label={strings.kidNote.backToBox} onPress={goBackToBox} />
 
         <View style={[styles.card, { backgroundColor: colors.paper }]}>
           <Text style={[styles.from, { color: colors.ink }]} accessibilityRole="header">
-            From {note.from}
+            {strings.kidNote.from(note.from)}
           </Text>
 
-          <NotePicture scene={note.picture} />
-
           <Text style={[styles.text, { color: colors.ink }]}>{note.text}</Text>
-
-          {/* Placeholder until parent audio notes are built (Phase 3). */}
-          <PlayButton from={note.from} onPress={() => {}} />
         </View>
       </ScrollView>
     </SafeAreaView>

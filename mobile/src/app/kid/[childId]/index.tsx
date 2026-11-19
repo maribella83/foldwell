@@ -18,8 +18,7 @@ import { GrownUpsGate } from '@/components/kid/grown-ups-gate';
 import { NoteBox } from '@/components/note-box/note-box';
 import { NotebookCover } from '@/components/notebook/notebook-cover';
 import { containerFor } from '@/constants/age-bands';
-import { useChild } from '@/data/family';
-import { notesForChild } from '@/data/sample-notes';
+import { useChild, useFamily } from '@/data/family';
 import { fonts, fontSize, palette, space } from '@/theme/tokens';
 
 const MAX_BOX_WIDTH = 420;
@@ -84,6 +83,7 @@ export default function KidHomeScreen() {
 }
 
 function NoteBoxHome({ childId, nickname, width }: { childId: string; nickname: string; width: number }) {
+  const { notesForChild } = useFamily();
   const notes = notesForChild(childId);
 
   return (

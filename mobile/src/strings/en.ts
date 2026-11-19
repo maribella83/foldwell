@@ -33,6 +33,53 @@ export const en = {
     addChild: 'Add a child',
   },
 
+  /** The parent's page for one child (only the parts converted so far). */
+  childPage: {
+    writeNote: (nickname: string) => `Write a note to ${nickname}`,
+    /** Shown to a child with a Note Box. */
+    comingSoonNoteBox:
+      'Photographing a handwritten note and recording your voice are on the way in a coming update.',
+    /** Shown to a child with a Notebook, whose notes can't be written yet. */
+    comingSoonNotebookTitle: 'Writing notes comes next',
+    comingSoonNotebook:
+      'Notes for the Notebook are on the way in a coming update.',
+    comingSoonNoteBoxTitle: 'More ways to write are coming',
+    /** Read aloud for one note in the list. */
+    noteA11y: (from: string, text: string) => `From ${from}: ${text}`,
+    noteFrom: (from: string) => `From ${from}`,
+  },
+
+  /** The "New note" sheet a parent writes in. */
+  noteForm: {
+    title: 'New note',
+    fromLabel: 'Who is this note from?',
+    fromHelp: 'The name your child knows you by, like Mom, Dad or Grandma.',
+    fromPlaceholder: 'Mom, Dad, Grandma…',
+    textLabel: 'What would you like to say?',
+    textHelp: 'Short and sweet is perfect. Your child will see it in big letters.',
+    textPlaceholder: 'Write your note here…',
+    lettersLeft: (count: number) => `${count} letters left`,
+    envelopeLabel: 'Pick an envelope',
+    envelopeHelp: 'Just for fun. It sets the color of the envelope in the box.',
+    envelopeNames: {
+      butter: 'Butter',
+      mint: 'Mint',
+      blush: 'Blush',
+    },
+    /** Read aloud for each envelope choice, e.g. "Mint envelope". */
+    envelopeA11y: (colorName: string) => `${colorName} envelope`,
+    save: (nickname: string) => `Put it in ${nickname}’s box`,
+    errorFrom: 'Add who the note is from.',
+    errorText: 'Write a few words first.',
+  },
+
+  /** A note opened in the Note Box (the child's side). */
+  kidNote: {
+    from: (from: string) => `From ${from}`,
+    backToBox: 'Back to my box',
+    missing: 'This note isn’t here.',
+  },
+
   /** Only shown while developing, never in a store build. */
   dev: {
     loadSampleFamily: 'Load sample family (testing only)',

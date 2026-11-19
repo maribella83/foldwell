@@ -8,7 +8,8 @@
  * How the screens fit together:
  *   index                    "Your family" (parent home)
  *   child/[childId]          one child's parent page
- *   add-child, .../edit      slide up as sheets
+ *   add-child, .../edit,     slide up as sheets
+ *   .../new-note
  *   kid/[childId]/...        the kid view (its own little stack). The
  *                            swipe-back gesture is off here, so a child
  *                            can't swipe into the parent screens; grown-ups
@@ -67,6 +68,7 @@ export default function RootLayout() {
             <Stack.Screen name="child/[childId]/index" options={{ headerShown: true, title: '' }} />
             <Stack.Screen name="add-child" options={{ presentation: 'modal' }} />
             <Stack.Screen name="child/[childId]/edit" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="child/[childId]/new-note" options={{ presentation: 'modal' }} />
             <Stack.Screen
               name="kid/[childId]"
               options={{

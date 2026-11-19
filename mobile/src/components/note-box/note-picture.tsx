@@ -6,8 +6,10 @@
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
-import type { PictureScene } from '@/data/sample-notes';
 import { illustration, radius } from '@/theme/tokens';
+
+/** Which simple placeholder picture to draw. Not used by any screen yet; photos come later. */
+export type PictureScene = 'sun' | 'moon' | 'heart';
 
 const HEART_PATH =
   'M12 21C12 21 3 15.5 3 9.5A4.5 4.5 0 0 1 12 7A4.5 4.5 0 0 1 21 9.5C21 15.5 12 21 12 21Z';

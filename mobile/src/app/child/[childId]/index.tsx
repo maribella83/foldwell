@@ -1,9 +1,10 @@
 /**
  * One child's page, seen by the parent.
  *
- * The main action is handing the phone over: "Open Sam's Note Box"
- * switches to the kid view. Below that, what's in the box, an honest note
- * about what's coming next, and a way to edit the child's details.
+ * Two main actions: write a note (Note Box children), and hand the phone
+ * over: "Open Sam's Note Box" switches to the kid view. Below that, what's
+ * in the box, an honest note about what's coming next, and a way to edit
+ * the child's details.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -13,13 +14,14 @@ import { GATE_LABEL } from '@/components/kid/grown-ups-gate';
 import { ContainerThumb } from '@/components/parent/container-thumb';
 import { ParentButton } from '@/components/parent/parent-button';
 import { ageBandInfo, containerNames } from '@/constants/age-bands';
-import { useChild } from '@/data/family';
-import { notesForChild } from '@/data/sample-notes';
+import { useChild, useFamily } from '@/data/family';
+import { strings } from '@/strings';
 import { envelopeColors, fonts, fontSize, palette, radius, space } from '@/theme/tokens';
 
 export default function ChildScreen() {
   const { childId } = useLocalSearchParams<{ childId: string }>();
   const child = useChild(childId);
+  const { notesForChild } = useFamily();
 
   if (!child) {
     return (
@@ -35,6 +37,8 @@ export default function ChildScreen() {
   const band = ageBandInfo[child.ageBand];
   const isNoteBox = band.container === 'noteBox';
   const container = containerNames[band.container];
+  // Notes are written for Note Box children for now; the Notebook that would
+  // show them to a tween or teen isn't built yet.
   const notes = isNoteBox ? notesForChild(child.id) : [];
 
   return (
@@ -53,7 +57,16 @@ export default function ChildScreen() {
         </View>
 
         <View style={styles.handOff}>
+          {isNoteBox && (
+            <ParentButton
+              label={strings.childPage.writeNote(child.nickname)}
+              onPress={() =>
+                router.push({ pathname: '/child/[childId]/new-note', params: { childId: child.id } })
+              }
+            />
+          )}
           <ParentButton
+            variant={isNoteBox ? 'secondary' : 'primary'}
             label={`Open ${child.nickname}’s ${container}`}
             accessibilityHint="Switches to the kid view"
             onPress={() =>
@@ -79,9 +92,11 @@ export default function ChildScreen() {
                     key={note.id}
                     style={[styles.noteRow, { backgroundColor: colors.paper }]}
                     accessible
-                    accessibilityLabel={`From ${note.from}: ${note.text}`}
+                    accessibilityLabel={strings.childPage.noteA11y(note.from, note.text)}
                   >
-                    <Text style={[styles.noteFrom, { color: colors.ink }]}>From {note.from}</Text>
+                    <Text style={[styles.noteFrom, { color: colors.ink }]}>
+                      {strings.childPage.noteFrom(note.from)}
+                    </Text>
                     <Text style={[styles.noteText, { color: colors.ink }]} numberOfLines={2}>
                       {note.text}
                     </Text>
@@ -99,11 +114,13 @@ export default function ChildScreen() {
         </View>
 
         <View style={styles.comingSoon}>
-          <Text style={styles.comingSoonTitle}>Writing notes comes next</Text>
-          <Text style={styles.comingSoonBody}>
+          <Text style={styles.comingSoonTitle}>
             {isNoteBox
-              ? 'Typing a note, photographing a handwritten one, and recording your voice are on the way in a coming update.'
-              : 'Typing a note and photographing a handwritten one are on the way in a coming update.'}
+              ? strings.childPage.comingSoonNoteBoxTitle
+              : strings.childPage.comingSoonNotebookTitle}
+          </Text>
+          <Text style={styles.comingSoonBody}>
+            {isNoteBox ? strings.childPage.comingSoonNoteBox : strings.childPage.comingSoonNotebook}
           </Text>
         </View>
 

@@ -12,7 +12,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
 
-import type { BoxNote } from '@/data/sample-notes';
+import type { Note } from '@/data/notes';
 import { fonts, palette, radius, space, touchTarget } from '@/theme/tokens';
 
 import { Envelope } from './envelope';
@@ -29,10 +29,10 @@ const INSET = 20;
 const TILTS = [-1.5, 1, -0.5];
 
 type Props = {
-  notes: BoxNote[];
+  notes: Note[];
   nickname: string;
   width: number;
-  onOpen: (note: BoxNote) => void;
+  onOpen: (note: Note) => void;
 };
 
 export function NoteBox({ notes, nickname, width, onOpen }: Props) {

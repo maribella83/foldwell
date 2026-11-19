@@ -1,6 +1,6 @@
 # Foldwell: Storage and Audio Plan
 
-Written November 19, 2026. **Plan only. Nothing in this plan is built yet.**
+Written November 19, 2026. **Status (November 19, 2026): Step 1 done and confirmed on Maribel's phone. Step 2 built and confirmed on her phone. Steps 3–5 not started.**
 
 Maribel lifted the hold on storage and audio on November 19, 2026. Reason: families who tried the Note Box expected the big voice button to play something or record. Right now it is a placeholder that does nothing (`mobile/src/components/note-box/play-button.tsx`, and `onPress={() => {}}` in `mobile/src/app/kid/[childId]/note/[noteId].tsx`).
 

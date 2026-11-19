@@ -1,6 +1,6 @@
 # Foldwell: Session Handoff
 
-**Last session:** November 18–19, 2026. **Update this file at the end of each session.**
+**Last session:** November 19, 2026 (second session that day). **Update this file at the end of each session.**
 
 ## Paste this to start a new chat
 
@@ -16,20 +16,28 @@ phone check went.
 
 ## Start here tomorrow
 
-**Step 1 of storage (save children on the phone) is built and pushed, but Maribel has not checked it on her phone yet.** Everything passed in the cloud workspace (`tsc`, `expo lint`, an iPhone bundle build, a SQL test), but the database can only really run on a phone.
+**Storage Step 1 (save children on the phone) is DONE: Maribel's five phone checks all passed (November 19).**
 
-Ask Maribel for the result of these five checks. She runs them in Expo Go after pulling the branch and running `npm install` (commands are under "Handy commands"):
+**Storage Step 2 (write a note) is DONE: built, and Maribel's seven phone checks all passed (November 19).** Also passed on the Mac: `tsc`, `expo lint`, and a `sqlite3` test of the new table. Check whether it is committed and pushed (`git status`); if not, ask her before committing.
 
-1. The app opens on an **empty** Your family screen (a fresh install starts empty; that is correct).
-2. Tap **Load sample family (testing only)**: Sam, Bea and Leo appear. Tap again: no duplicates.
-3. **Add a child** (for example "Mimi", 9–12), **close the app completely** (swipe it away), reopen from Expo Go: **Mimi is still there.** This is the main test.
-4. **Edit** her nickname, close fully, reopen: the new name stuck.
-5. **Remove** her, close fully, reopen: she stays gone.
+**Next:** Step 3 (record a voice note). Before that, get her answers to the two open questions at the bottom of this section. The checks she ran, for reference (`npx expo start --port 8082`, then Expo Go):
 
-- **If all five pass:** go to **Step 2 (write a note)** in `Storage-and-Audio-Plan.md`. No new package is needed for Step 2.
-- **If any fail:** ask for the red error text or a screenshot and fix it before moving on.
+1. **Load sample family** (testing only). Open **Sam**'s page: "In the Note Box" lists Mom, Dad, Grandma. Bea and Leo have none.
+2. On **Bea**'s page tap **Write a note to Bea**. Try **Save with nothing typed**: it should ask for who it's from and for a few words. Then write one as "Mom", pick an envelope, save. It appears at the top of Bea's list.
+3. Tap **Open Bea's Note Box** → her envelope is in the box → tap it → the note opens with big text. There is **no play button** (on purpose, see below).
+4. **Close the app completely**, reopen: Bea's note is still there.
+5. Write a **second** note: "From" should already say "Mom", and the envelope color should be the next one in the rotation. Try a **long** "from" like "Grandma Joy" and a long note (scrolls on the note screen).
+6. **Remove Bea** (Edit details), then **Load sample family** again so Bea comes back: her old note must **not** reappear (notes go with the child).
+7. **Leo (13+)**'s page has **no** "Write a note" button (Notebook notes come later; says so on the page).
+
+- **If all pass:** next is **Step 3 (record a voice note)** in `Storage-and-Audio-Plan.md`. It needs two new packages (`expo-audio`, `expo-file-system`): **ask before installing.**
+- **If any fail:** ask for the red error text or a screenshot and fix it first.
 
 Also small and quick: ask Maribel to run `npx expo-doctor` on her Mac (two checks could not run in the cloud workspace because they need Expo's servers).
+
+**Questions to put to Maribel (not decided):**
+- A parent cannot **edit or delete a note** after saving it (a typo stays). Not in the plan; it is a small, natural next piece. Add it before Step 3, or wait?
+- Notes are written for **Note Box children (4–8) only** for now, because the Notebook that would show them isn't built.
 
 ---
 
@@ -55,13 +63,15 @@ All of this session's work is on the branch **`claude/foldwell-session-handoff-p
 2. **Strings file, step 1:** `mobile/src/strings/en.ts` + `index.ts`. Only the Your family screen and child cards read from it so far. Checked in the web preview.
 3. Phone could not open the app: Expo Go had updated itself to SDK 58, and iPhones can only run the newest SDK. **Upgraded Foldwell to SDK 58** (done in the cloud workspace, one small code fix in `child/[childId]/edit.tsx` for a React Native type rename). Maribel confirmed the Your family screen, child page and Add/Edit sheets work.
 4. Maribel found the big voice button does nothing (it is a placeholder, by design) and said testers expected it to play or record. She lifted the hold; a plan was written and her four decisions confirmed (`Storage-and-Audio-Plan.md`).
-5. **Storage step 1 built** (see above).
+5. **Storage step 1 built**, then confirmed on her phone (all five checks passed).
+6. **Storage step 2 built** (write a note). Her Mac's branch was 6 commits behind GitHub at the start; fast-forwarded (nothing lost). `npm install` was missing `expo-sqlite` in her folder, so it was run once (2 packages added, lockfile unchanged).
 
 ## What's built (`mobile/`)
 
 ```
 Your family (home)                     src/app/index.tsx
 ├── child page                         src/app/child/[childId]/index.tsx
+│   ├── Write a note (sheet)           src/app/child/[childId]/new-note.tsx
 │   ├── Edit details / Remove (sheet)  src/app/child/[childId]/edit.tsx
 │   └── "Open Sam's Note Box" ──► kid view
 │         Note Box or Notebook cover   src/app/kid/[childId]/index.tsx
@@ -69,13 +79,16 @@ Your family (home)                     src/app/index.tsx
 └── Add a child (sheet)                src/app/add-child.tsx
 ```
 
-- **Database** (`src/data/database.ts`): on-device SQLite (`expo-sqlite`), numbered migrations, one table so far (`children`: id, nickname, age band, created time). **Never edit a migration once shipped; add a new one.** `SQLiteProvider` wraps the whole app in `src/app/_layout.tsx`.
-- **Family data** (`src/data/family.tsx`): `FamilyProvider` reads and writes the database. Screens still use `useFamily()` and `useChild()` exactly as before. A fresh install starts **empty**. A **development-only** "Load sample family (testing only)" button on the home screen adds Sam (4–8), Bea (4–8) and Leo (13+); real store builds never show it.
-- **Sample notes** (`src/data/sample-notes.ts`): still **FAKE** and in memory; only the sample child "Sam" (id `sam`) has them. Step 2 replaces this file with real saved notes.
-- **Strings** (`src/strings/`): English words for the Your family screen, child cards and the dev button. Every other screen still has its words written inside it.
+- **Database** (`src/data/database.ts`): on-device SQLite (`expo-sqlite`), numbered migrations, now **two tables**: `children` (id, nickname, age band, created time) and `notes` (id, child id, "from" label, envelope color, body text, created time). Migration 2 added `notes`. Foreign keys are switched on at every start, and a child's notes are deleted with the child. **Never edit a migration once shipped; add a new one** (Step 3 will add an `audio_file` column as migration 3). `SQLiteProvider` wraps the whole app in `src/app/_layout.tsx`.
+- **Family data** (`src/data/family.tsx`): `FamilyProvider` reads and writes the database. Screens use `useFamily()` (children **and** notes: `notesForChild`, `findNote`, `addNote`) and `useChild()`. A fresh install starts **empty**. A **development-only** "Load sample family (testing only)" button on the home screen adds Sam (4–8) with three notes, Bea (4–8, empty box) and Leo (13+); real store builds never show it.
+- **Notes** (`src/data/notes.ts`): the `Note` type, the checks before saving (needs a "from" and some words for now; later words **or** a recording), limits (from: 16 letters, note: 1000 letters), and the read/insert functions. There is deliberately **no** seen/played field (rule 6). Newest note first.
+- **Sample notes** (`src/data/sample-notes.ts`): now only the **developer sample** (Sam's three notes), saved by "Load sample family". Not shown to real families.
+- **Write a note** (`new-note.tsx`, `components/parent/note-form.tsx`, `envelope-picker.tsx`): sheet with who it's from (pre-filled with the last one used in that box), the words, and a 3-color envelope picker (color names written on the swatches plus a check mark, not color alone). Only for Note Box children for now.
+- **Kid note screen:** shows the saved note in big text. **The big "Hear Mom" button is hidden** until a note has a voice recording (Step 4); `play-button.tsx` is kept for then. `note-picture.tsx` (placeholder sun/moon/heart art) is no longer used by any screen; keep for photos later or delete (ask first).
+- **Strings** (`src/strings/`): English words for the Your family screen, child cards, the dev button, the New note sheet, the kid note screen, and the new parts of the child page. Every other screen still has its words written inside it.
 - **Age bands** (`src/constants/age-bands.ts`): 4–8 = Note Box, 9–12 and 13+ = Notebook. `isUnder13()` is for privacy decisions. Its labels ("Ages 4–8", "Note Box") are still English-only in that file.
 - **Kid view safety:** hold-to-leave "Grown-ups" button (1.5 seconds; a tap does nothing). iPhone swipe-back is off, and Android's back button is ignored on the box. It keeps small hands out but **isn't a lock**.
-- **Big voice button** (`src/components/note-box/play-button.tsx`): a **placeholder**; its press does nothing yet. Size and look are final.
+- **Big voice button** (`src/components/note-box/play-button.tsx`): not shown on any screen right now. Size and look are final; Step 4 puts it back on notes that have a recording.
 - **Notebook cover**, parent pieces (`src/components/parent/`), theme (`src/theme/tokens.ts`, no hardcoded colors), fonts (Lora, Nunito, DM Mono, all open licenses), Reduce Motion helper, app name in `src/constants/app.ts` + `app.json`, icons and splash: all as before.
 - **Web preview does NOT work any more** with the database (it needs extra web setup; we test on the phone instead). `.claude/launch.json` still exists for the browser pane.
 
@@ -83,7 +96,7 @@ Full write-up of the parent screens, 10 bugs found and fixed: `Parent-Screens-Au
 
 ## Open items
 
-1. **Phone check of storage Step 1** (above), then Steps 2–5 of `Storage-and-Audio-Plan.md`: write a note, record a voice, play it, test with the real microphone wording via an EAS build. **Ask before installing** `expo-audio` and `expo-file-system`.
+1. **Steps 3–5 of `Storage-and-Audio-Plan.md`:** record a voice, play it, test with the real microphone wording via an EAS build. **Ask before installing** `expo-audio` and `expo-file-system`. First settle edit/delete for saved notes (question above).
 2. **Strings file, remaining work:** convert the other screens (about 17 files, in small batches Maribel checks), then the wording in `constants/age-bands.ts`, then draft Spanish (a native speaker should review it). New screens should read from `src/strings/` from the start.
 3. **Phone checklist** (`Parent-Screens-Audit.md`, section 6), still not checked one by one: swipe-back blocked in the Note Box, the Grown-ups hold with a real finger, swipe-down blocked on a half-filled sheet, keyboard, VoiceOver, large text. Now possible because the phone works.
 4. **`CLAUDE.md` still says to hold audio and the database** ("Current phase" section). Maribel lifted that hold on November 19. Ask her OK and update that paragraph.

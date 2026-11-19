@@ -1,11 +1,11 @@
 /**
- * The family: the children a parent writes to.
+ * The family: the children a parent writes to, and the notes they write.
  *
- * Children are saved in the on-device database (see database.ts), so they
- * are still there after the app is closed. A fresh install starts empty.
- * Screens keep calling useFamily() the same way as before.
+ * Children and notes are saved in the on-device database (see database.ts),
+ * so they are still there after the app is closed. A fresh install starts
+ * empty. Screens use useFamily() to read and change both.
  *
- * The list on screen is kept in memory too, so screens update instantly;
+ * The lists on screen are kept in memory too, so screens update instantly;
  * every change is written to the database first, and only then shown.
  * (Writing one tiny row is instant. Expo's docs only warn against heavy
  * work with these "sync" commands.)
@@ -16,6 +16,16 @@ import { useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 import { AGE_BANDS, type AgeBand } from '@/constants/age-bands';
+import {
+  cleanFrom,
+  cleanText,
+  insertNote,
+  makeNoteId,
+  readNotes,
+  type Note,
+  type NoteInput,
+} from '@/data/notes';
+import { sampleNotes } from '@/data/sample-notes';
 
 export type Child = {
   id: string;
@@ -123,12 +133,20 @@ function insertChild(db: SQLiteDatabase, child: Child) {
   );
 }
 
+/** Handed out when a child has no notes, so "no notes" is always the same empty list. */
+const NO_NOTES: Note[] = [];
+
 type FamilyContextValue = {
   kids: Child[];
   getChild: (id: string | undefined) => Child | undefined;
   addChild: (input: ChildInput) => Child;
   updateChild: (id: string, input: ChildInput) => void;
   removeChild: (id: string) => void;
+  /** A child's notes, newest first. Empty if the child has none (or doesn't exist). */
+  notesForChild: (childId: string | undefined) => Note[];
+  /** Looks only inside this child's box, so one child's link can't open another's note. */
+  findNote: (childId: string | undefined, noteId: string | undefined) => Note | undefined;
+  addNote: (childId: string, input: NoteInput) => Note;
   /** For testing while developing only: adds Sam, Bea and Leo (skips any already there). */
   loadSampleFamily: () => void;
 };
@@ -139,8 +157,35 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
   const db = useSQLiteContext();
   // The function form runs once, on the first render: read what is saved.
   const [kids, setKids] = useState<Child[]>(() => readChildren(db));
+  const [notes, setNotes] = useState<Note[]>(() => readNotes(db));
 
   const getChild = useCallback((id: string | undefined) => kids.find((kid) => kid.id === id), [kids]);
+
+  // Sorts the notes into one list per child. A Map (not a plain object), so
+  // an id like "constructor" can't pick up a built-in property.
+  const notesByChild = useMemo(() => {
+    const map = new Map<string, Note[]>();
+    for (const note of notes) {
+      const list = map.get(note.childId);
+      if (list) {
+        list.push(note);
+      } else {
+        map.set(note.childId, [note]);
+      }
+    }
+    return map;
+  }, [notes]);
+
+  const notesForChild = useCallback(
+    (childId: string | undefined) => (childId ? (notesByChild.get(childId) ?? NO_NOTES) : NO_NOTES),
+    [notesByChild],
+  );
+
+  const findNote = useCallback(
+    (childId: string | undefined, noteId: string | undefined) =>
+      notesForChild(childId).find((note) => note.id === noteId),
+    [notesForChild],
+  );
 
   const addChild = useCallback(
     (input: ChildInput) => {
@@ -174,9 +219,32 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
 
   const removeChild = useCallback(
     (id: string) => {
-      // Later steps: this will also delete the child's notes and voice files.
-      db.runSync('DELETE FROM children WHERE id = ?', id);
+      // One unit: the child's notes and the child go together, or neither does.
+      // (Later, this will also delete the child's voice files.)
+      db.withTransactionSync(() => {
+        db.runSync('DELETE FROM notes WHERE child_id = ?', id);
+        db.runSync('DELETE FROM children WHERE id = ?', id);
+      });
       setKids((current) => current.filter((kid) => kid.id !== id));
+      setNotes((current) => current.filter((note) => note.childId !== id));
+    },
+    [db],
+  );
+
+  const addNote = useCallback(
+    (childId: string, input: NoteInput) => {
+      const note: Note = {
+        id: makeNoteId(),
+        childId,
+        from: cleanFrom(input.from),
+        envelope: input.envelope,
+        text: cleanText(input.text),
+        createdAt: Date.now(),
+      };
+      insertNote(db, note);
+      // Newest first, matching the order the database hands them back.
+      setNotes((current) => [note, ...current]);
+      return note;
     },
     [db],
   );
@@ -189,18 +257,60 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
         !takenNames.has(sample.nickname.toLocaleLowerCase()),
     );
     if (toAdd.length === 0) return;
-    // One unit: all three are saved, or none.
+
+    // Sam's sample notes come along. Each is stamped a second earlier than
+    // the one before, so they sit in the box in the order they're listed.
+    const now = Date.now();
+    const toAddNotes: Note[] = [];
+    for (const sample of toAdd) {
+      (sampleNotes[sample.id] ?? []).forEach((input, index) => {
+        toAddNotes.push({
+          id: `${sample.id}-sample-${index + 1}`,
+          childId: sample.id,
+          from: input.from,
+          envelope: input.envelope,
+          text: input.text,
+          createdAt: now - index * 1000,
+        });
+      });
+    }
+
+    // One unit: all the children and notes are saved, or none.
     db.withTransactionSync(() => {
       for (const sample of toAdd) {
         insertChild(db, sample);
       }
+      for (const note of toAddNotes) {
+        insertNote(db, note);
+      }
     });
     setKids((current) => [...current, ...toAdd]);
+    setNotes((current) => [...toAddNotes, ...current]);
   }, [db, kids]);
 
   const value = useMemo(
-    () => ({ kids, getChild, addChild, updateChild, removeChild, loadSampleFamily }),
-    [kids, getChild, addChild, updateChild, removeChild, loadSampleFamily],
+    () => ({
+      kids,
+      getChild,
+      addChild,
+      updateChild,
+      removeChild,
+      notesForChild,
+      findNote,
+      addNote,
+      loadSampleFamily,
+    }),
+    [
+      kids,
+      getChild,
+      addChild,
+      updateChild,
+      removeChild,
+      notesForChild,
+      findNote,
+      addNote,
+      loadSampleFamily,
+    ],
   );
 
   return <FamilyContext.Provider value={value}>{children}</FamilyContext.Provider>;

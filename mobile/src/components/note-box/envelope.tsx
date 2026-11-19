@@ -9,7 +9,7 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 
-import type { BoxNote } from '@/data/sample-notes';
+import type { Note } from '@/data/notes';
 import { envelopeColors, fonts, palette, radius } from '@/theme/tokens';
 
 const HEART_PATH =
@@ -20,7 +20,7 @@ const STAMP_HEIGHT = 48;
 const EDGE = 16;
 
 type Props = {
-  note: BoxNote;
+  note: Note;
   width: number;
   height: number;
   /** Where the envelope sits inside the box. */
@@ -97,7 +97,13 @@ export function Envelope({ note, width, height, top, left, tilt, onPress }: Prop
         />
       </Svg>
 
-      <Text style={[styles.from, { color: colors.ink }]} numberOfLines={1}>
+      {/* A longer "from" shrinks a little to fit, rather than getting cut off. */}
+      <Text
+        style={[styles.from, { color: colors.ink }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.75}
+      >
         From {note.from}
       </Text>
     </Pressable>
