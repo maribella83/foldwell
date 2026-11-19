@@ -46,9 +46,9 @@ export default function NewNoteScreen() {
         automaticallyAdjustKeyboardInsets
       >
         <NoteForm
-          nickname={child.nickname}
           initialFrom={initialFrom}
           initialEnvelope={initialEnvelope}
+          submitLabel={strings.noteForm.save(child.nickname)}
           onSubmit={(input) => {
             addNote(child.id, input);
             router.back();

@@ -20,7 +20,19 @@ phone check went.
 
 **Storage Step 2 (write a note) is DONE: built, and Maribel's seven phone checks all passed (November 19).** Also passed on the Mac: `tsc`, `expo lint`, and a `sqlite3` test of the new table. Check whether it is committed and pushed (`git status`); if not, ask her before committing.
 
-**Next:** Step 3 (record a voice note). Before that, get her answers to the two open questions at the bottom of this section. The checks she ran, for reference (`npx expo start --port 8082`, then Expo Go):
+**Step 2 is committed and pushed** (`6603ac1`).
+
+**Edit and delete for saved notes (Step 2b) is DONE: built, and all six phone checks passed (November 19). Check `git status` to see if it is committed and pushed; if not, ask her before committing.** Maribel asked for it before voice. Tapping a note on the child's page opens an "Edit note" sheet (the New note form, filled in, same place in the box); "Delete this note" is at the bottom and asks on the screen first. Files: `child/[childId]/edit-note.tsx`, `updateNote`/`removeNote`/`useNote` in `family.tsx`, `updateNoteRow`/`deleteNoteRow` in `notes.ts`, `NoteForm` now takes `submitLabel` and `initialText`. Lint passes; `tsc` passes with the generated route-types file skipped (see "Things learned"). **Phone checks for 2b (all passed):**
+1. Sam's page: tap "Dad". The Edit note sheet opens with Dad's words, "Dad", Mint.
+2. Change the words and the envelope color, **Save changes**. The list updates, and the note stays in the same spot. Open Sam's Note Box: the envelope has the new color; tap it: new words.
+3. Change something, then try to swipe the sheet down (iPhone): it should refuse. **Cancel** still closes it, nothing saved.
+4. Clear the words and Save: it asks for a few words.
+5. **Delete this note** → "Delete this note?" appears on the screen with Keep note / Delete note. **Keep note** goes back. **Delete note** removes it. Close the app fully, reopen: still gone.
+6. Delete **all** of a child's notes: the page says "Nothing in Sam's box yet." and the box is empty.
+
+**Maribel approved installing `expo-audio` and `expo-file-system` (November 19)**, for Step 3. Not installed yet; install with `npx expo install expo-audio expo-file-system` from `mobile` (2b is now checked, so Step 3 can start). Read the SDK 58 docs for both first (the `mobile/AGENTS.md` rule). Still unanswered: keep or delete the unused `note-picture.tsx` (ask first before deleting).
+
+**Next:** Step 3 (record a voice note). The Step 2 checks she ran, for reference (`npx expo start --port 8082`, then Expo Go):
 
 1. **Load sample family** (testing only). Open **Sam**'s page: "In the Note Box" lists Mom, Dad, Grandma. Bea and Leo have none.
 2. On **Bea**'s page tap **Write a note to Bea**. Try **Save with nothing typed**: it should ask for who it's from and for a few words. Then write one as "Mom", pick an envelope, save. It appears at the top of Bea's list.
@@ -35,9 +47,9 @@ phone check went.
 
 Also small and quick: ask Maribel to run `npx expo-doctor` on her Mac (two checks could not run in the cloud workspace because they need Expo's servers).
 
-**Questions to put to Maribel (not decided):**
-- A parent cannot **edit or delete a note** after saving it (a typo stays). Not in the plan; it is a small, natural next piece. Add it before Step 3, or wait?
+**Notes for Maribel:**
 - Notes are written for **Note Box children (4–8) only** for now, because the Notebook that would show them isn't built.
+- When Step 3 adds voice, **deleting a note must also delete its recording file** (comment left in `deleteNoteRow`), and so must removing a child.
 
 ---
 
@@ -144,6 +156,8 @@ Maribel wants a short welcome experience the first time a parent opens the app: 
 - **Her Mac is slow the first time** it reads files after a change: the first `tsc`/`lint`/Metro run took minutes (88 seconds for one `tsc`), later runs 2 seconds. Cause not found (iCloud Desktop sync was only a guess). Be patient; ask how long she waited.
 - **Port 8081 is taken** by her other project (Merak). `npx expo start` then asks a question; answer `y`, or use `--port 8082`.
 - Her Terminal opens in her home folder; she must `cd ~/Desktop/passing-notes-app` first. Several other Expo servers (Merak, Kongvene) may be running at once; that was not the cause of any problem.
+
+- **Two dev servers at once scramble `mobile/.expo/types/router.d.ts`.** Maribel often has one on port 8091 (web preview) and one on 8082 (phone). When a new route file is added, both rewrite that generated, gitignored file at the same moment and it ends up garbled, so `npx tsc --noEmit` fails with errors only inside `.expo/types/router.d.ts` (not our code). Fix: stop one server (Ctrl+C in its Terminal tab), then start the other; it regenerates the file. Until then, a typecheck that skips that file is a fair check (config in the session scratchpad: `extends` the project tsconfig, `include` only `src`, `exclude` `.expo`). Never edit that file by hand. Also: the web preview server on 8091 is not needed any more (the database doesn't run on web).
 
 ## Handy commands
 

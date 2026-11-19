@@ -19,9 +19,11 @@ import { AGE_BANDS, type AgeBand } from '@/constants/age-bands';
 import {
   cleanFrom,
   cleanText,
+  deleteNoteRow,
   insertNote,
   makeNoteId,
   readNotes,
+  updateNoteRow,
   type Note,
   type NoteInput,
 } from '@/data/notes';
@@ -147,6 +149,9 @@ type FamilyContextValue = {
   /** Looks only inside this child's box, so one child's link can't open another's note. */
   findNote: (childId: string | undefined, noteId: string | undefined) => Note | undefined;
   addNote: (childId: string, input: NoteInput) => Note;
+  /** Changes a note's words, "from" or envelope. It keeps its place in the box. */
+  updateNote: (childId: string, noteId: string, input: NoteInput) => void;
+  removeNote: (childId: string, noteId: string) => void;
   /** For testing while developing only: adds Sam, Bea and Leo (skips any already there). */
   loadSampleFamily: () => void;
 };
@@ -249,6 +254,32 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
     [db],
   );
 
+  const updateNote = useCallback(
+    (childId: string, noteId: string, input: NoteInput) => {
+      const from = cleanFrom(input.from);
+      const text = cleanText(input.text);
+      updateNoteRow(db, childId, noteId, { from, envelope: input.envelope, text });
+      setNotes((current) =>
+        current.map((note) =>
+          note.id === noteId && note.childId === childId
+            ? { ...note, from, envelope: input.envelope, text }
+            : note,
+        ),
+      );
+    },
+    [db],
+  );
+
+  const removeNote = useCallback(
+    (childId: string, noteId: string) => {
+      deleteNoteRow(db, childId, noteId);
+      setNotes((current) =>
+        current.filter((note) => !(note.id === noteId && note.childId === childId)),
+      );
+    },
+    [db],
+  );
+
   const loadSampleFamily = useCallback(() => {
     const takenNames = new Set(kids.map((kid) => kid.nickname.toLocaleLowerCase()));
     const toAdd = sampleFamily.filter(
@@ -298,6 +329,8 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
       notesForChild,
       findNote,
       addNote,
+      updateNote,
+      removeNote,
       loadSampleFamily,
     }),
     [
@@ -309,6 +342,8 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
       notesForChild,
       findNote,
       addNote,
+      updateNote,
+      removeNote,
       loadSampleFamily,
     ],
   );
@@ -341,4 +376,21 @@ export function useChild(childId: string | undefined): Child | undefined {
   }
 
   return child ?? (lastSeen?.id === childId ? lastSeen : undefined);
+}
+
+/**
+ * One note, for a screen about that note. Like findNote(), except that right
+ * after the note is deleted it keeps returning its last words, so the sheet
+ * sliding away doesn't flash "not found" on the way out.
+ */
+export function useNote(childId: string | undefined, noteId: string | undefined): Note | undefined {
+  const { findNote } = useFamily();
+  const note = findNote(childId, noteId);
+  const [lastSeen, setLastSeen] = useState(note);
+
+  if (note && note !== lastSeen) {
+    setLastSeen(note);
+  }
+
+  return note ?? (lastSeen?.id === noteId && lastSeen?.childId === childId ? lastSeen : undefined);
 }

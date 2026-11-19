@@ -106,6 +106,28 @@ export function readNotes(db: SQLiteDatabase): Note[] {
   }));
 }
 
+/** Changes what the parent wrote. The note keeps its id, child and date (so it keeps its place). */
+export function updateNoteRow(
+  db: SQLiteDatabase,
+  childId: string,
+  noteId: string,
+  fields: NoteInput,
+) {
+  db.runSync(
+    'UPDATE notes SET from_label = ?, envelope = ?, body = ? WHERE id = ? AND child_id = ?',
+    fields.from,
+    fields.envelope,
+    fields.text,
+    noteId,
+    childId,
+  );
+}
+
+/** Later, when a note can have a voice recording, deleting it must delete that file too. */
+export function deleteNoteRow(db: SQLiteDatabase, childId: string, noteId: string) {
+  db.runSync('DELETE FROM notes WHERE id = ? AND child_id = ?', noteId, childId);
+}
+
 export function insertNote(db: SQLiteDatabase, note: Note) {
   db.runSync(
     'INSERT INTO notes (id, child_id, from_label, envelope, body, created_at) VALUES (?, ?, ?, ?, ?, ?)',

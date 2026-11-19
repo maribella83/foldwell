@@ -33,24 +33,35 @@ import { ParentButton } from './parent-button';
 const SHOW_LETTERS_LEFT_BELOW = 100;
 
 type Props = {
-  nickname: string;
-  /** Pre-filled "from" and envelope for a new note. */
+  /** The starting "from" and envelope: pre-filled for a new note, the saved ones when editing. */
   initialFrom: string;
   initialEnvelope: EnvelopeColor;
+  /** The saved words when editing; leave out for a new note. */
+  initialText?: string;
+  submitLabel: string;
   onSubmit: (input: NoteInput) => void;
 };
 
-export function NoteForm({ nickname, initialFrom, initialEnvelope, onSubmit }: Props) {
+export function NoteForm({
+  initialFrom,
+  initialEnvelope,
+  initialText = '',
+  submitLabel,
+  onSubmit,
+}: Props) {
   const [from, setFrom] = useState(initialFrom);
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initialText);
   const [envelope, setEnvelope] = useState<EnvelopeColor>(initialEnvelope);
   const [triedToSave, setTriedToSave] = useState(false);
   const submitted = useRef(false);
 
   const errors = checkNote(from, text);
   const shownErrors: NoteFormErrors = triedToSave ? errors : {};
-  // Typing a "from" doesn't count as work worth protecting, since it's pre-filled.
-  const dirty = text.trim().length > 0 || cleanFrom(from) !== cleanFrom(initialFrom);
+  // Anything changed from where the form started? Then swiping the sheet away is blocked.
+  const dirty =
+    text.trim() !== initialText.trim() ||
+    cleanFrom(from) !== cleanFrom(initialFrom) ||
+    envelope !== initialEnvelope;
   const lettersLeft = NOTE_MAX_LENGTH - text.length;
 
   function handleSave() {
@@ -134,7 +145,7 @@ export function NoteForm({ nickname, initialFrom, initialEnvelope, onSubmit }: P
         <EnvelopePicker value={envelope} onChange={setEnvelope} />
       </View>
 
-      <ParentButton label={strings.noteForm.save(nickname)} onPress={handleSave} />
+      <ParentButton label={submitLabel} onPress={handleSave} />
     </View>
   );
 }

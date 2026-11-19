@@ -7,7 +7,7 @@
  * the child's details.
  */
 import { router, useLocalSearchParams } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GATE_LABEL } from '@/components/kid/grown-ups-gate';
@@ -16,7 +16,15 @@ import { ParentButton } from '@/components/parent/parent-button';
 import { ageBandInfo, containerNames } from '@/constants/age-bands';
 import { useChild, useFamily } from '@/data/family';
 import { strings } from '@/strings';
-import { envelopeColors, fonts, fontSize, palette, radius, space } from '@/theme/tokens';
+import {
+  envelopeColors,
+  fonts,
+  fontSize,
+  palette,
+  radius,
+  space,
+  touchTarget,
+} from '@/theme/tokens';
 
 export default function ChildScreen() {
   const { childId } = useLocalSearchParams<{ childId: string }>();
@@ -84,26 +92,40 @@ export default function ChildScreen() {
             In the {container}
           </Text>
           {notes.length > 0 ? (
-            <View style={styles.noteList}>
-              {notes.map((note) => {
-                const colors = envelopeColors[note.envelope];
-                return (
-                  <View
-                    key={note.id}
-                    style={[styles.noteRow, { backgroundColor: colors.paper }]}
-                    accessible
-                    accessibilityLabel={strings.childPage.noteA11y(note.from, note.text)}
-                  >
-                    <Text style={[styles.noteFrom, { color: colors.ink }]}>
-                      {strings.childPage.noteFrom(note.from)}
-                    </Text>
-                    <Text style={[styles.noteText, { color: colors.ink }]} numberOfLines={2}>
-                      {note.text}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
+            <>
+              <Text style={styles.notesHint}>{strings.childPage.notesHint}</Text>
+              <View style={styles.noteList}>
+                {notes.map((note) => {
+                  const colors = envelopeColors[note.envelope];
+                  return (
+                    <Pressable
+                      key={note.id}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/child/[childId]/edit-note',
+                          params: { childId: child.id, noteId: note.id },
+                        })
+                      }
+                      accessibilityRole="button"
+                      accessibilityLabel={strings.childPage.noteA11y(note.from, note.text)}
+                      accessibilityHint={strings.childPage.noteRowHint}
+                      style={({ pressed }) => [
+                        styles.noteRow,
+                        { backgroundColor: colors.paper },
+                        pressed && styles.noteRowPressed,
+                      ]}
+                    >
+                      <Text style={[styles.noteFrom, { color: colors.ink }]}>
+                        {strings.childPage.noteFrom(note.from)}
+                      </Text>
+                      <Text style={[styles.noteText, { color: colors.ink }]} numberOfLines={2}>
+                        {note.text}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </>
           ) : (
             <Text style={styles.empty}>
               {isNoteBox
@@ -187,13 +209,23 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: palette.ink,
   },
+  notesHint: {
+    fontFamily: fonts.ui,
+    fontSize: 15,
+    color: palette.softInk,
+    marginTop: -space.xs,
+  },
   noteList: {
     gap: space.sm,
   },
   noteRow: {
+    minHeight: touchTarget.standard,
     borderRadius: radius.md,
     padding: space.md,
     gap: 2,
+  },
+  noteRowPressed: {
+    opacity: 0.75,
   },
   noteFrom: {
     fontFamily: fonts.uiExtraBold,

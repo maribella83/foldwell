@@ -46,6 +46,9 @@ export const en = {
     comingSoonNoteBoxTitle: 'More ways to write are coming',
     /** Read aloud for one note in the list. */
     noteA11y: (from: string, text: string) => `From ${from}: ${text}`,
+    /** Small line under "In the Note Box" when it has notes. */
+    notesHint: 'Tap a note to change or delete it.',
+    noteRowHint: 'Opens the note so you can change or delete it',
     noteFrom: (from: string) => `From ${from}`,
   },
 
@@ -71,6 +74,19 @@ export const en = {
     save: (nickname: string) => `Put it in ${nickname}’s box`,
     errorFrom: 'Add who the note is from.',
     errorText: 'Write a few words first.',
+  },
+
+  /** The "Edit note" sheet: the same form, with the saved note filled in, plus delete. */
+  noteEdit: {
+    title: 'Edit note',
+    saveChanges: 'Save changes',
+    deleteQuiet: 'Delete this note',
+    confirmTitle: 'Delete this note?',
+    confirmBody: (nickname: string) =>
+      `This note will be taken out of ${nickname}’s box and deleted from this phone. This can’t be undone.`,
+    keep: 'Keep note',
+    confirmDelete: 'Delete note',
+    missing: 'This note isn’t here any more.',
   },
 
   /** A note opened in the Note Box (the child's side). */
