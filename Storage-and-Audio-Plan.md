@@ -66,6 +66,8 @@ No counts, "new" badges, or "heard" markers anywhere. The app must never show wh
 
 ## 5. Decisions needed from Maribel
 
+> **Confirmed by Maribel, November 19, 2026: "Yes to all, recommended."** (1) First launch is empty, with a developer-only way to load Sam, Bea and Leo. (2) A note needs words or a voice recording, either is fine. (3) "From" stays a typed label. (4) The iPhone-backup question goes on the attorney list. Still to do: ask before installing each new package.
+
 1. **First launch: empty, or with sample children?** Recommendation: **empty**, which is what a real family sees. For testing, we keep a way to load Sam, Bea and Leo (for example only while developing).
 2. **A note needs at least one of: words or a voice recording.** Recommendation: allow either or both, because the Blueprint says text is the support and voice leads for ages 4–8.
 3. **Who a note is "from":** a free-text label the parent types ("Mom", "Grandma"). That is how the sample notes work today. Recommendation: keep it.
