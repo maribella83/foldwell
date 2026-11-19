@@ -6,7 +6,7 @@
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, type ScrollViewInstance, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ChildForm } from '@/components/parent/child-form';
@@ -23,7 +23,7 @@ export default function EditChildScreen() {
   const child = useChild(childId);
   const [confirmingRemove, setConfirmingRemove] = useState(false);
   const removed = useRef(false);
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const reduceMotion = useReduceMotion();
 
   if (!child) {
